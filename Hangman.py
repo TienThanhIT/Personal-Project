@@ -1,159 +1,205 @@
-#LAB1
-#======================================================
-def swap_first_characters(str1, str2):
-    if len(str1) < 2 or len(str2) < 2:
-        return "Cả hai chuỗi phải có ít nhất 2 ký tự."
+import random
+import time
+import os
+
+def clr():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def chosenword():
+    bimat = {#Nhap danh sach cac tu}
+    return random.choice(list(bimat))
+
+def timer(s, kt):
+    while s>0 and not kt.is_set():
+        giay = s % 60
+        phut = int(s / 60) % 60
+        print(f"Thời gian còn lai: {phut:02}:{giay:02}", end= "\r") 
+        time.sleep(1)
+        s-=1
+    if  s==0:
+        kt.set()
+
+def display_hangman(luot):
+    trangthai = [ 
+                """
+                   ------
+                   |    |
+                   |    O
+                   |   /|\\
+                   |   / \\
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    O
+                   |   /|
+                   |   / \\
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    O
+                   |    |
+                   |   / \\
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    O
+                   |    |
+                   |   /
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    O
+                   |    |
+                   |    
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    O
+                   |    
+                   |   
+                   |
+                """,
+                """
+                   ------
+                   |    |
+                   |    
+                   |    
+                   |   
+                   |
+                """,
+                """
+                   ------
+                   |    
+                   |    
+                   |    
+                   |   
+                   |
+                """
+    ]
+    return trangthai[luot]
+
+def trangthaigame(hangman, dahoanthien, tusai):
+    print(hangman)
+    print(dahoanthien)
+    print("Các từ đã đoán: " + ", ".join(tusai))
+
+def menu():
+    time.sleep(1)
+    clr()
+    print("CHÀO MỪNG ĐẾN VỚI TRÒ CHƠI HANGMAN")
+    print("==================================")
+    time.sleep(1)
+    print("Hướng dẫn chơi:")
+    time.sleep(1)
+    print("Trò chơi sẽ chọn một cụm từ bí mật ngẫu nhiên. Mục tiêu của bạn là đoán ra được cụm từ đó.")
+    time.sleep(1)
+    print("Nếu bạn đoán sai quá 7 lần, bạn sẽ thua!")
+    time.sleep(1)
+    print("Bạn đã sẵn sàng chơi chưa?")
+    time.sleep(1)
+    i = input("y: Rồi, bắt đầu chơi!    n: Chưa, thoát khỏi đây\n").strip().lower()
+    while i not in ['y', 'n']:
+        i = input("Cú pháp nhập không hợp lệ, nhập lại: ").strip().lower()
+    if i == 'y':
+        play()
+    else: 
+        exit()
+
+def player_input():
+    while True:
+        doan = input("Hãy đoán một chữ cái hoặc có thể trả lời đáp án từ bí mật: ").lower().strip()
+        return doan
+
+def continuegame():
+    i = input("Nhấn 'r' để chơi lại. Nhấn phím bất kì để thoát \n")
+    if i == 'r':
+        play()
+    else: exit()
+
+def play():
+    tu = chosenword()
+    dahoanthien = "".join(['_' if char != ' ' else ' ' for char in tu]) 
+    luot = 7
+    tusai = []
+    tudadoan = []
     
-    new_str1 = str2[:2] + str1[2:] 
-    new_str2 = str1[:2] + str2[2:] 
-    
-    return f"{new_str1} {new_str2}"
+    while "_" in dahoanthien and luot > 0:
+        hangman = display_hangman(luot) 
 
-result = swap_first_characters('gps', 'fpt')
-print(result)
+        clr()
+        print(hangman)
+        print(dahoanthien)
+        print("Các từ đã đoán: "+", ".join(tudadoan))
+        doan = player_input()
+        clr()
 
-#========================================================
+        if len(doan) == 1 and doan.isalpha(): 
+            if doan in tudadoan:
+                print("Bạn đã đoán chữ này rồi!")
+            elif doan not in tu:
+                print("Chữ", doan)
+                time.sleep(0.5)
+                print("Rất tiếc! Không có chữ", doan, "trong từ bí mật")
+                luot -= 1
+                tusai.append(doan)
+                tudadoan.append(doan)
+            elif doan in tu:
+                count = tu.count(doan)
+                print("Chữ ", doan)
+                time.sleep(1)
+                print(f"Chúc mừng! Có {count} chữ {doan}")
+                tubimat = list(dahoanthien)
+                hoanthien = [i for i, c in enumerate(tu) if c == doan]
+                for index in hoanthien:
+                    tubimat[index] = doan
+                dahoanthien = ''.join(tubimat)
+                tudadoan.append(doan)
 
-def remove_even_index_chars(s):
-    return ''.join([s[i] for i in range(len(s)) if i % 2 != 0])
+        elif len(doan) > 1:
+            if doan.strip() == tu:
+                time.sleep(2)
+                clr()
+                dahoanthien = doan  
+                print(f"Chúc mừng! '{doan}' là đáp án chính xác!")
+            elif doan.isalpha() == False:
+                while doan.isalpha() == False:
+                    input("Cú pháp nhập không hợp lệ, hãy nhập lại: ")
+            else:
+                time.sleep(2)
+                print("Rất tiếc! Đó không phải là câu trả lời đúng")
+                luot -= 1
 
-result = remove_even_index_chars('Dai hoc Can Tho')
-print(result) 
-
-#========================================================
-
-def count_word(sentence):
-
-    words = sentence.split()
-    
-    word_count = {}
-    
-    for word in words:
-    
-        word = word.lower()
-        if word in word_count:
-            word_count[word] += 1
-        else:
-            word_count[word] = 1
+        if "_" not in dahoanthien:
+            print("Bạn đã hoàn thành trò chơi")
+            time.sleep(1)
+            print(hangman)
+            time.sleep(1)
+            print("Các từ đã đoán: " + ", ".join(tudadoan))
+            time.sleep(1)
+            print("======================================")
+            continuegame()
             
-    return word_count
+        elif luot == 0:
+            print(display_hangman(0))
+            time.sleep(1)
+            print("Bạn đã thua...")
+            time.sleep(1)
+            print("Từ đúng là: ", tu)
+            time.sleep(1)
+            print("Các từ đã đoán: " + ", ".join(tudadoan))
+            time.sleep(1)
+            print("======================================")
+            continuegame()
 
-
-result = count_word('Co cong mai sat, co ngay nen kim')
-print(result)  
-
-#======================================================
-
-def mahoa(s):
-    encoded = ''
-    for char in s:
-        if char.isalpha():
-            new_char = chr((ord(char) - ord('a') - 3) % 26 + ord('a')) if char.islower() else chr((ord(char) - ord('A') - 3) % 26 + ord('A'))
-            encoded += new_char
-        else:
-            encoded += char  
-    return encoded
-
-result = mahoa('Tinhoclythuyet')
-print(result) 
-
-#=====================================================
-
-def is_valid_string(s, allowed_chars):
-    allowed_set = set(allowed_chars)
-    for char in s:
-        if char not in allowed_set:
-            return False  
-    
-    return True  
-
-allowed_characters = '012'  
-print(is_valid_string('0011', allowed_characters))  
-print(is_valid_string('12', allowed_characters))    
-print(is_valid_string('012', allowed_characters))
-print(is_valid_string('122', allowed_characters))   
-print(is_valid_string('123', allowed_characters))   
-print(is_valid_string('24', allowed_characters)) 
-
-#==================================================
-
-def string_to_list(s):
-    return s.split()
-
-result = string_to_list('Cau dua du xoai')
-print(result)
-
-#==================================================
-
-def khongtrung(s):
-    s = s.lower()
-  
-    char_count = {}
-
-    for char in s:
-        char_count[char] = char_count.get(char, 0) + 1
-
-    for char in s:
-        if char_count[char] == 1:
-            return char
-    
-    return None
-
-
-print(khongtrung('abcdef'))     
-print(khongtrung('abcabcdef'))   
-print(khongtrung('aabbcc'))      
-print(khongtrung('AaBbCc'))       
-print(khongtrung('aA'))  
-
-#===================================================
-
-def bokhoangtrang(s):
-    return s.replace(' ', '')
-
-
-result = bokhoangtrang('Dai hoc Can Tho')
-print(result)  
-
-#===================================================
-
-def laptu(s):
-    s = s.lower()
-    words = s.split()
-  
-    seen = set()
-    
-
-    for word in words:
-        if word in seen:
-            return word
-        seen.add(word)
-    return None 
-
-
-result = laptu('Co cong mai sat, co ngay nen kim')
-print(result)
-  
-#====================================================
-
-def day0dainhat(s):
-    max_length = 0  
-    current_length = 0  
-
-    for char in s:
-        if char == '0':
-            current_length += 1  
-        else:
-            max_length = max(max_length, current_length)  
-            current_length = 0  
-  
-    max_length = max(max_length, current_length)
-
-    return max_length
-
-
-result = day0dainhat('0000000100100011')
-print(result)
-
-#==================================================
-
+if __name__ == "__main__":
+    menu()
