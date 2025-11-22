@@ -77,9 +77,6 @@ def load_uma_list(filename='UmaList.txt'):
             logging.warning(f"File '{filename}' loaded, but it is empty.")
     except FileNotFoundError:
         logging.error(f"Critical Error: Character list file '{filename}' not found. Using fallback.")
-        # Fallback list for stability during initialization
-        UMALIST = ['Special Week', 'Tokai Teio', 'Oguri Cap']
-        logging.info("Using temporary fallback list for UMALIST.")
     
     return UMALIST
 
@@ -220,5 +217,6 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
