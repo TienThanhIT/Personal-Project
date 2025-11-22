@@ -19,6 +19,7 @@ def home():
 def run():
     # 1. Get the port from the environment variable 'PORT'
     # 2. Use a fallback (10000) if 'PORT' is not set
+    # CRITICAL FIX: This ensures the Flask server binds to the port assigned by the hosting environment.
     port = int(os.environ.get("PORT", 10000))
     
     # host='0.0.0.0' is required for cloud hosting services
