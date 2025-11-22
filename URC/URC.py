@@ -222,7 +222,7 @@ async def list_uma(ctx):
 processed_messages = set()
 
 @bot.command()
-async def challenge(ctx):
+async def urc(ctx):
     # ...
     # --- AGGRESSIVE DUPLICATE COMMAND CHECK (Final Defense Layer) ---
     # 1. Check if we've processed this message ID before.
@@ -264,5 +264,6 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
