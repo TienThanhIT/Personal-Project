@@ -214,14 +214,18 @@ async def challenge(ctx):
     global processed_messages
 
     # --- AGGRESSIVE DUPLICATE COMMAND CHECK (Final Defense Layer) ---
-    # If the message ID has already been seen (and responded to) by one of the processes,
-    # the second process will immediately return, preventing the duplicate response.
+    # 1. Check if we've processed this message ID before.
     if ctx.message.id in processed_messages:
+        # If the message ID has already been seen (and responded to) by one of the processes,
+        # the second process will immediately return, preventing the duplicate response.
         print(f"--- DUPLICATE MESSAGE ID {ctx.message.id} detected. Skipping response. ---")
         return
     
-    # Add the message ID to the set to mark it as processed
+    # 2. If it's new, mark it as processed immediately.
+    # We must do this before the network call (await ctx.send) to ensure the ID is set
+    # even if the second bot instance is slightly delayed.
     processed_messages.add(ctx.message.id)
+    print(f"--- MESSAGE ID {ctx.message.id} added to processed_messages set. ---")
     # -----------------------------------------------------------
 
 
