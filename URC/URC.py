@@ -217,9 +217,8 @@ async def challenge(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
-    # DIAGNOSTIC STEP: Comment out keep_alive to see if it stops the double post.
-    # keep_alive() 
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
