@@ -219,11 +219,13 @@ async def list_uma(ctx):
     else:
         await ctx.send("The Uma Musume list is currently **empty**. Please ensure `UmaList.txt` exists and has entries.")
 
+# Cache for message IDs already responded to. This is the last line of defense
+# against duplicate processes reading the same command message.
+processed_messages = set()
+
 @bot.command()
 async def challenge(ctx):
-    """Generates a random Uma Musume training challenge."""
-    global processed_messages
-
+    # ...
     # --- AGGRESSIVE DUPLICATE COMMAND CHECK (Final Defense Layer) ---
     # 1. Check if we've processed this message ID before.
     if ctx.message.id in processed_messages:
@@ -234,6 +236,7 @@ async def challenge(ctx):
     processed_messages.add(ctx.message.id)
     print(f"--- MESSAGE ID {ctx.message.id} added to processed_messages set. ---")
     # -----------------------------------------------------------
+    # ...
 
 
     if not UMALIST:
@@ -263,3 +266,4 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
