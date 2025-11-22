@@ -105,7 +105,7 @@ def generate_challenge_embed():
 
     embed = discord.Embed(
         title=":trophy: Uma Musume Training Challenge :trophy:",
-        description="Your goal: Clear the target scenario with the given Uma Musume and strategy.",
+        description="Your goal: Clear the target scenario with the given Uma Musume and card types.",
         color=0xf04d55 # Uma Musume themed red/pink
     )
     
@@ -264,6 +264,7 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
 
