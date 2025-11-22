@@ -4,6 +4,10 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
+import time # CRITICAL: Imported for stable port binding startup
+
+# CRITICAL FIX: Import the keep_alive function
+from keep_alive import keep_alive
 
 # --- 1. CONFIGURATION AND INITIALIZATION ---
 load_dotenv()
@@ -30,9 +34,6 @@ UMA_IMAGE_MAP = {}
 DEFAULT_IMAGE_URL = 'https://placehold.co/128x128/cccccc/555555?text=UMA'
 
 # --- 2. FILE LOADING FUNCTIONS ---
-
-# --- UPDATED FUNCTION: Load Image Map (single URL per line) ---
-# Harmonized default filename to UmaPic.txt
 def load_image_map(filename='UmaPic.txt'):
     """
     Loads the Uma Musume name-to-URL mapping from a file.
@@ -41,25 +42,19 @@ def load_image_map(filename='UmaPic.txt'):
     global UMA_IMAGE_MAP
     UMA_IMAGE_MAP = {}
     try:
-        # Use the standard image map file
         with open(filename, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
-                # Skip comments and empty lines
                 if not line or line.startswith('#'):
                     continue
-                
-                # Split the line by the pipe '|' separator (max split 1 for safety)
                 parts = [p.strip() for p in line.split('|', 1)]
                 
                 if len(parts) == 2:
                     name, url = parts
-                    # Store the single URL string as the dictionary value
                     UMA_IMAGE_MAP[name] = url
                     
         logging.info(f"Loaded {len(UMA_IMAGE_MAP)} Uma Musume images from {filename}.")
     except FileNotFoundError:
-        # Added a direct print for better visibility if the file is missing
         print(f"CRITICAL ERROR: Image Map file '{filename}' not found. Images will not load.")
         logging.error(f"Image Map file '{filename}' not found. Using default placeholder image.")
     except Exception as e:
@@ -73,10 +68,17 @@ def load_uma_list(filename='UmaList.txt'):
         # Load with UTF-8 encoding to handle international characters
         with open(filename, 'r', encoding='utf-8') as f:
             UMALIST = [line.strip() for line in f if line.strip()]
+
+        # DIAGNOSTIC PRINT ADDED
+        print(f"--- DIAGNOSTIC: Loaded {len(UMALIST)} characters from '{filename}'. ---")
         if not UMALIST:
             logging.warning(f"File '{filename}' loaded, but it is empty.")
     except FileNotFoundError:
         logging.error(f"Critical Error: Character list file '{filename}' not found. Using fallback.")
+        # Fallback list for stability during initialization.
+        UMALIST = ['Special Week', 'Tokai Teio', 'Oguri Cap']
+        logging.info("Using temporary fallback list for UMALIST.")
+        print(f"--- DIAGNOSTIC: Used Fallback List of size {len(UMALIST)}. ---")
     
     return UMALIST
 
@@ -108,8 +110,6 @@ def generate_challenge_embed():
         color=0xf04d55 # Uma Musume themed red/pink
     )
     
-    # embed.set_thumbnail(url=image_url) # Removed previously
-    
     embed.add_field(name="Uma Musume", value=f"**{random_uma}**", inline=False)
     embed.add_field(name="Target Scenario", value=f"**{random_scenario}**", inline=False) 
     embed.add_field(name="Required Deck Composition", value=deck_suggestion, inline=False)
@@ -120,7 +120,6 @@ def generate_challenge_embed():
     return embed
 
 # --- 4. VIEW (BUTTON) CLASS ---
-
 class ChallengeView(discord.ui.View):
     """A persistent view that provides a button to regenerate the challenge."""
     def __init__(self):
@@ -214,9 +213,10 @@ async def challenge(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
+    # CRITICAL FIX: Starts the Flask server thread that Render pings every 5-10 minutes.
+    keep_alive() 
+    # CRITICAL FIX: Give the Flask server 1 second to bind to the port before starting the Discord connection
+    time.sleep(1) 
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
-
-
-
