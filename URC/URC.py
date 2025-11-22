@@ -4,6 +4,8 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
+# NEW: Import the keep_alive function
+from keep_alive import keep_alive
 
 # --- 1. CONFIGURATION AND INITIALIZATION ---
 load_dotenv()
@@ -101,25 +103,24 @@ def generate_challenge_embed():
     deck_str = ", ".join(random_deck_types)
 
     deck_suggestion = (
-        f"Use a deck consisting of the following 6 types (5 Support Cards + 1 Borrowing Card):"
+        f"Use a deck consisting of the following 6 types (5 Support Cards + 1 Borrow Card):"
         f"\n\n**{deck_str}**"
     )
 
     embed = discord.Embed(
         title=":trophy: Uma Musume Training Challenge :trophy:",
-        description="Your goal: Clear the target scenario with the given Uma Musume and card deck.",
+        description="Your goal: Clear the target scenario with the given Uma Musume and strategy.",
         color=0xf04d55 # Uma Musume themed red/pink
     )
     
-    # REMOVED: The image was set as a small thumbnail
-    # embed.set_thumbnail(url=image_url) 
+    # embed.set_thumbnail(url=image_url) # Removed previously
     
-    embed.add_field(name="Uma Musume:", value=f"**{random_uma}**", inline=False)
-    # ADDED: Set the image property, which displays a large image at the bottom of the embed
+    embed.add_field(name="Uma Musume", value=f"**{random_uma}**", inline=False)
+    embed.add_field(name="Target Scenario", value=f"**{random_scenario}**", inline=False) 
+    embed.add_field(name="Required Deck Composition", value=deck_suggestion, inline=False)
+    
+    # Set the image property, which displays a large image at the bottom of the embed
     embed.set_image(url=image_url) 
-    embed.add_field(name="Target Scenario:", value=f"**{random_scenario}**", inline=False) 
-    embed.add_field(name="Required Deck Composition:", value=deck_suggestion, inline=False)
-
     
     return embed
 
@@ -137,6 +138,8 @@ class ChallengeView(discord.ui.View):
         try:
             new_embed = generate_challenge_embed()
             await interaction.message.edit(embed=new_embed, view=self)
+            await interaction.followup.send("New challenge generated!", ephemeral=True)
+
         except ValueError as e:
             await interaction.followup.send(f"Error: {e}", ephemeral=True)
         except Exception as e:
@@ -216,6 +219,8 @@ async def challenge(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
+    # DIAGNOSTIC STEP: Comment out keep_alive to see if it stops the double post.
+    # keep_alive() 
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
