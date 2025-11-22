@@ -4,7 +4,7 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
-import time # CRITICAL: Imported for stable port binding startup
+import time 
 
 # CRITICAL FIX: Import the keep_alive function from the correct file name: host.py
 from host import keep_alive
@@ -25,6 +25,10 @@ intents.members = True
 # Initialize bot
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# --- GLOBAL BOT STATE FLAG ---
+# CRITICAL FIX for double execution: This flag ensures on_ready only runs once.
+bot.is_ready_flag = False
+
 # Define global lists for the challenge
 TYPE_LIST = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit']
 SCENARIO_LIST = ['Ura Finale', 'Unity Cup']
@@ -37,14 +41,10 @@ DEFAULT_IMAGE_URL = 'https://placehold.co/128x128/cccccc/555555?text=UMA'
 def load_image_map(filename='UmaPic.txt'):
     """
     Loads the Uma Musume name-to-URL mapping from a file.
-    It expects a single URL per line (Name | URL).
     """
     global UMA_IMAGE_MAP
     UMA_IMAGE_MAP = {}
     try:
-        # NOTE: The list uses UmaPic.txt but the image file name is UmaImageMap.txt. 
-        # For now, keeping filename='UmaPic.txt' as in the function definition, 
-        # assuming the user may rename the file back or has another file named UmaPic.txt.
         with open(filename, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
@@ -68,17 +68,14 @@ def load_uma_list(filename='UmaList.txt'):
     """Loads the list of Uma Musume names from a text file."""
     global UMALIST
     try:
-        # Load with UTF-8 encoding to handle international characters
         with open(filename, 'r', encoding='utf-8') as f:
             UMALIST = [line.strip() for line in f if line.strip()]
 
-        # DIAGNOSTIC PRINT ADDED
         print(f"--- DIAGNOSTIC: Loaded {len(UMALIST)} characters from '{filename}'. ---")
         if not UMALIST:
             logging.warning(f"File '{filename}' loaded, but it is empty.")
     except FileNotFoundError:
         logging.error(f"Critical Error: Character list file '{filename}' not found. Using fallback.")
-        # Fallback list for stability during initialization.
         UMALIST = ['Special Week', 'Tokai Teio', 'Oguri Cap']
         logging.info("Using temporary fallback list for UMALIST.")
         print(f"--- DIAGNOSTIC: Used Fallback List of size {len(UMALIST)}. ---")
@@ -96,13 +93,8 @@ def generate_challenge_embed():
     random_deck_types = random.choices(TYPE_LIST, k=6) 
     random_scenario = random.choice(SCENARIO_LIST)
     
-    # Get the single image URL directly from the map
-    # NOTE: The load_image_map function is hardcoded to look for UmaPic.txt, 
-    # but the image map content is in UmaImageMap.txt. This may still cause issues if the filename is not UmaPic.txt.
-    # We proceed with the assumption that UmaPic.txt is the correct file on deployment.
     image_url = UMA_IMAGE_MAP.get(random_uma, DEFAULT_IMAGE_URL)
     
-    # Format the list of 6 types for clean display
     deck_str = ", ".join(random_deck_types)
 
     deck_suggestion = (
@@ -120,7 +112,6 @@ def generate_challenge_embed():
     embed.add_field(name="Target Scenario", value=f"**{random_scenario}**", inline=False) 
     embed.add_field(name="Required Deck Composition", value=deck_suggestion, inline=False)
     
-    # Set the image property, which displays a large image at the bottom of the embed
     embed.set_image(url=image_url) 
     
     return embed
@@ -149,9 +140,18 @@ class ChallengeView(discord.ui.View):
 # --- 5. BOT EVENTS ---
 @bot.event
 async def on_ready():
+    # --- CRITICAL DOUBLE-RUN CHECK ---
+    if bot.is_ready_flag:
+        # If the flag is already set, this is a redundant on_ready call, so we exit.
+        print('--- WARNING: Redundant on_ready event detected. Ignoring. ---')
+        return
+
+    # Set the flag to True on the first successful run.
+    bot.is_ready_flag = True
+    # ---------------------------------
+    
     # Load all external files on startup
     load_uma_list()
-    # Now correctly loads the default 'UmaPic.txt'
     load_image_map() 
     loaded_count = len(UMALIST)
     image_map_count = len(UMA_IMAGE_MAP)
@@ -219,9 +219,7 @@ async def challenge(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
-    # CRITICAL FIX: Starts the Flask server thread that Render pings every 5-10 minutes.
     keep_alive() 
-    # CRITICAL FIX: Give the Flask server 1 second to bind to the port before starting the Discord connection
     time.sleep(1) 
     bot.run(token, log_handler=handler)
 else:
