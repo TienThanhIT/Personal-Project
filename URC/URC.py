@@ -4,8 +4,6 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
-# NEW: Import the keep_alive function
-from keep_alive import keep_alive
 
 # --- 1. CONFIGURATION AND INITIALIZATION ---
 load_dotenv()
@@ -224,3 +222,4 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
