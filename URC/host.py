@@ -15,7 +15,7 @@ def home():
 def run():
     # 1. Get the port from the environment variable 'PORT'
     # 2. Use the standard fallback of 8080 if 'PORT' is not set (e.g., when running locally)
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 10000))
     
     # host='0.0.0.0' is required for cloud hosting services to bind correctly
     print(f"Flask server attempting to start on port: {port}")
@@ -26,3 +26,4 @@ def keep_alive():
     """Starts the Flask server thread to keep the host alive."""
     t = Thread(target=run)
     t.start()
+
