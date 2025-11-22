@@ -1,0 +1,6 @@
+WARNING:discord.client:PyNaCl is not installed, voice will NOT be supported
+[2025-11-22 12:19:17] [INFO    ] discord.client: logging in using static token
+[2025-11-22 12:19:17] [INFO    ] discord.client: logging in using static token
+[2025-11-22 12:19:19] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: b39991101360900b82de28b3e535f034).
+[2025-11-22 12:19:19] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: b39991101360900b82de28b3e535f034).
+[2025-11-22 12:19:21] [INFO    ] root: Loaded 49 Uma Musume images from UmaPic.txt.
