@@ -6,8 +6,8 @@ import os
 import random
 import time # CRITICAL: Imported for stable port binding startup
 
-# CRITICAL FIX: Import the keep_alive function
-from keep_alive import keep_alive
+# CRITICAL FIX: Import the keep_alive function from the correct file name: host.py
+from host import keep_alive
 
 # --- 1. CONFIGURATION AND INITIALIZATION ---
 load_dotenv()
@@ -42,6 +42,9 @@ def load_image_map(filename='UmaPic.txt'):
     global UMA_IMAGE_MAP
     UMA_IMAGE_MAP = {}
     try:
+        # NOTE: The list uses UmaPic.txt but the image file name is UmaImageMap.txt. 
+        # For now, keeping filename='UmaPic.txt' as in the function definition, 
+        # assuming the user may rename the file back or has another file named UmaPic.txt.
         with open(filename, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
@@ -94,6 +97,9 @@ def generate_challenge_embed():
     random_scenario = random.choice(SCENARIO_LIST)
     
     # Get the single image URL directly from the map
+    # NOTE: The load_image_map function is hardcoded to look for UmaPic.txt, 
+    # but the image map content is in UmaImageMap.txt. This may still cause issues if the filename is not UmaPic.txt.
+    # We proceed with the assumption that UmaPic.txt is the correct file on deployment.
     image_url = UMA_IMAGE_MAP.get(random_uma, DEFAULT_IMAGE_URL)
     
     # Format the list of 6 types for clean display
