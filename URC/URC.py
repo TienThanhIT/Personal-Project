@@ -145,8 +145,6 @@ class ChallengeView(discord.ui.View):
             new_embed = generate_challenge_embed()
             # Edit the original message to show the new challenge
             await interaction.message.edit(embed=new_embed, view=self)
-            # Send an ephemeral (private) confirmation message to the user
-            await interaction.followup.send("New challenge generated!", ephemeral=True)
 
         except ValueError as e:
             await interaction.followup.send(f"Error: {e}", ephemeral=True)
@@ -266,4 +264,5 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
