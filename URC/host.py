@@ -1,5 +1,6 @@
 from flask import Flask
 from threading import Thread
+import os # <-- REQUIRED to read the PORT environment variable
 
 # Create the Flask app instance
 app = Flask(__name__)
@@ -12,9 +13,13 @@ def home():
 
 # Function to run the Flask server in a separate thread
 def run():
+    # 1. Get the port from the environment variable 'PORT'
+    # 2. Use the standard fallback of 8080 if 'PORT' is not set (e.g., when running locally)
+    port = int(os.environ.get("PORT", 8080))
+    
     # host='0.0.0.0' is required for cloud hosting services to bind correctly
-    # port=8080 is a common port, though hosts usually specify their own
-    app.run(host='0.0.0.0', port=8080)
+    print(f"Flask server attempting to start on port: {port}")
+    app.run(host='0.0.0.0', port=port)
 
 # Function to start the web server thread
 def keep_alive():
