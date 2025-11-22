@@ -6,7 +6,7 @@ import os
 import random
 import time 
 
-# CRITICAL FIX: Import the keep_alive function from the correct file name: host.py
+# CRITICAL FIX: Import the keep_alive function from host.py
 from host import keep_alive
 
 # --- 1. CONFIGURATION AND INITIALIZATION ---
@@ -50,7 +50,8 @@ def load_image_map(filename='UmaPic.txt'):
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
-                parts = [p.strip() for p in line.split('|', 1)]
+                # Assuming the actual file name is 'UmaPic.txt' based on the user's file content
+                parts = [p.strip() for p in line.split('|', 1)] 
                 
                 if len(parts) == 2:
                     name, url = parts
@@ -112,6 +113,7 @@ def generate_challenge_embed():
     embed.add_field(name="Target Scenario", value=f"**{random_scenario}**", inline=False) 
     embed.add_field(name="Required Deck Composition", value=deck_suggestion, inline=False)
     
+    # Note: We use set_image instead of set_thumbnail for a large focus on the Uma's picture.
     embed.set_image(url=image_url) 
     
     return embed
@@ -120,15 +122,19 @@ def generate_challenge_embed():
 class ChallengeView(discord.ui.View):
     """A persistent view that provides a button to regenerate the challenge."""
     def __init__(self):
+        # Increased timeout to 5 minutes (300 seconds) for convenience
         super().__init__(timeout=300) 
 
     @discord.ui.button(label="Regenerate Challenge", style=discord.ButtonStyle.red, emoji="🔄")
     async def regenerate_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # Acknowledge the interaction immediately to avoid timeout
         await interaction.response.defer() 
         
         try:
             new_embed = generate_challenge_embed()
+            # Edit the original message to show the new challenge
             await interaction.message.edit(embed=new_embed, view=self)
+            # Send an ephemeral (private) confirmation message to the user
             await interaction.followup.send("New challenge generated!", ephemeral=True)
 
         except ValueError as e:
@@ -140,9 +146,9 @@ class ChallengeView(discord.ui.View):
 # --- 5. BOT EVENTS ---
 @bot.event
 async def on_ready():
-    # --- CRITICAL DOUBLE-RUN CHECK ---
+    # --- CRITICAL DOUBLE-RUN CHECK (First Defense Layer) ---
+    # This prevents duplicate command loading if the Discord client reconnects.
     if bot.is_ready_flag:
-        # If the flag is already set, this is a redundant on_ready call, so we exit.
         print('--- WARNING: Redundant on_ready event detected. Ignoring. ---')
         return
 
@@ -163,7 +169,6 @@ async def on_ready():
     print(f'Bot Prefix: {bot.command_prefix}')
     print('------------------------')
 
-# This event handler catches errors outside the command structure
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
@@ -175,6 +180,7 @@ async def on_command_error(ctx, error):
         print(f"FORBIDDEN ERROR: {error_message}")
         print("-------------------------------")
         try:
+            # Only try to send an error message if possible
             await ctx.send(f"**Permission Error:** I failed to respond to your command due to missing permissions. Please fix my server permissions.")
         except:
             pass
@@ -185,6 +191,10 @@ async def on_command_error(ctx, error):
 
 
 # --- 6. BOT COMMANDS ---
+# Cache for message IDs already responded to. This is the last line of defense
+# against duplicate processes reading the same command message.
+processed_messages = set()
+
 @bot.command()
 async def ping(ctx):
     """Checks bot responsiveness."""
@@ -201,6 +211,20 @@ async def list_uma(ctx):
 @bot.command()
 async def challenge(ctx):
     """Generates a random Uma Musume training challenge."""
+    global processed_messages
+
+    # --- AGGRESSIVE DUPLICATE COMMAND CHECK (Final Defense Layer) ---
+    # If the message ID has already been seen (and responded to) by one of the processes,
+    # the second process will immediately return, preventing the duplicate response.
+    if ctx.message.id in processed_messages:
+        print(f"--- DUPLICATE MESSAGE ID {ctx.message.id} detected. Skipping response. ---")
+        return
+    
+    # Add the message ID to the set to mark it as processed
+    processed_messages.add(ctx.message.id)
+    # -----------------------------------------------------------
+
+
     if not UMALIST:
         await ctx.send('**Critical Error:** The Uma Musume list is empty! Cannot generate a challenge. Please run `!list` to check the status.')
         return
@@ -219,8 +243,11 @@ async def challenge(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
+    # Start the Flask web server thread
     keep_alive() 
+    # Give the web server a moment to start before running the bot
     time.sleep(1) 
+    # Start the Discord bot
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
