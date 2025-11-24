@@ -41,7 +41,7 @@ def load_image_map(filename='UmaPic.txt'):
     Loads the Uma Musume name-to-URL mapping from a file.
     """
     global UMA_IMAGE_MAP
-    UMA_IMAGE_MAP = {}
+    UMA_IMAGE_MAP = {}
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             for line in f:
@@ -262,6 +262,7 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
 
