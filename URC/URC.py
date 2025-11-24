@@ -37,7 +37,7 @@ DEFAULT_IMAGE_URL = 'https://placehold.co/128x128/cccccc/555555?text=UMA'
 
 # --- 2. FILE LOADING FUNCTIONS ---
 def load_image_map(filename='UmaPic.txt'):
-    """
+    """
     Loads the Uma Musume name-to-URL mapping from a file.
     """
     global UMA_IMAGE_MAP
@@ -262,4 +262,5 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
