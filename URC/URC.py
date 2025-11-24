@@ -264,5 +264,3 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
-
-I want the regenerate button only work for only author who input !urc. Those who don't will response as a note message
