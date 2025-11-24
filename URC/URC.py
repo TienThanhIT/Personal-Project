@@ -136,20 +136,30 @@ class ChallengeView(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Regenerate Challenge", style=discord.ButtonStyle.red, emoji="🔄")
+   @discord.ui.button(label="Regenerate Challenge", style=discord.ButtonStyle.red, emoji="🔄")
     async def regenerate_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Acknowledge the interaction immediately to avoid timeout
+        # CRITICAL FIX: Acknowledge the interaction IMMEDIATELY.
+        # This tells Discord the bot is working and prevents the "This interaction failed" error.
         await interaction.response.defer() 
         
         try:
             new_embed = generate_challenge_embed()
-            # Edit the original message to show the new challenge
-            await interaction.message.edit(embed=new_embed, view=self)
+            
+            # Use interaction.followup.edit_message() after deferring
+            # interaction.followup is the correct way to send/edit messages 
+            # after the initial deferral (or initial response).
+            await interaction.followup.edit_message(
+                message_id=interaction.message.id, 
+                embed=new_embed, 
+                view=self
+            )
 
         except ValueError as e:
+            # Note: For errors after defer, use followup.send(ephemeral=True)
             await interaction.followup.send(f"Error: {e}", ephemeral=True)
         except Exception as e:
             logging.error("Error during challenge regeneration button click.", exc_info=True)
+            # Use followup.send for the error message
             await interaction.followup.send("An unexpected error occurred. Check the log.", ephemeral=True)
 
 # --- 5. BOT EVENTS ---
@@ -264,6 +274,7 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
 
