@@ -252,13 +252,13 @@ async def list_uma(ctx):
 @bot.command()
 async def urc(ctx):
     """Generates a random Uma Musume Training Challenge."""
-    
     # --- AGGRESSIVE DUPLICATE COMMAND CHECK (Final Defense Layer) ---
+    # 1. Check if we've processed this message ID before.
     if ctx.message.id in processed_messages:
         print(f"--- DUPLICATE MESSAGE ID {ctx.message.id} detected. Skipping response. ---")
         return
-
-    # If it's new, mark it as processed immediately.
+    
+    # 2. If it's new, mark it as processed immediately.
     processed_messages.add(ctx.message.id)
     print(f"--- MESSAGE ID {ctx.message.id} added to processed_messages set. ---")
     # -----------------------------------------------------------
@@ -292,11 +292,15 @@ async def urc(ctx):
 # --- 7. EXECUTION ---
 if token:
     print("Attempting to run bot...")
+    # Add explicit logging before starting the web server
+    print("--- Attempting to start the web server for host keep-alive... ---")
     # Start the Flask web server thread
-    keep_alive()  
+    keep_alive() 
+    print("--- Web server started in background thread. ---")
     # Give the web server a moment to start before running the bot
-    time.sleep(1)  
-    # Start the Discord bot. CRITICAL FIX: log_handler must be passed here.
+    time.sleep(1) 
+    # Start the Discord bot
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
