@@ -136,7 +136,7 @@ class ChallengeView(discord.ui.View):
             return False
         return True
 
-   @discord.ui.button(label="Regenerate Challenge", style=discord.ButtonStyle.red, emoji="🔄")
+    @discord.ui.button(label="Regenerate Challenge", style=discord.ButtonStyle.red, emoji="🔄")
     async def regenerate_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         # CRITICAL FIX: Acknowledge the interaction IMMEDIATELY.
         # This tells Discord the bot is working and prevents the "This interaction failed" error.
@@ -153,7 +153,7 @@ class ChallengeView(discord.ui.View):
                 embed=new_embed, 
                 view=self
             )
-
+    
         except ValueError as e:
             # Note: For errors after defer, use followup.send(ephemeral=True)
             await interaction.followup.send(f"Error: {e}", ephemeral=True)
@@ -274,6 +274,7 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
 
