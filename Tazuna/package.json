@@ -1,0 +1,29 @@
+{
+  "name": "tazuna",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TazunaBot for managing your uma club needs",
+  "main": "scripts/app.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.x"
+  },
+  "scripts": {
+    "start": "node scripts/app.js",
+    "register": "node scripts/commands.js",
+    "dev": "nodemon scripts/app.js"
+  },
+  "author": "vivi",
+  "license": "MIT",
+  "dependencies": {
+    "discord-interactions": "^4.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "googleapis": "^157.0.0",
+    "node-fetch": "^3.3.2",
+    "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

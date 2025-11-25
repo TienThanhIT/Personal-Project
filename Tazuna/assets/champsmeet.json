@@ -1,0 +1,116 @@
+[
+    {
+        "name": "Taurus Cup 2025",
+        "number": "1",
+        "track":
+        {
+            "racetrack": "Tokyo",
+            "terrain": "Turf",
+            "distance_type": "Medium",
+            "distance_meters": "2400m",
+            "direction": "Left-Handed",
+            "ground": "Firm",
+            "season": "Spring",
+            "weather": "Sunny",
+            "similar": "Japanese Derby (Tokyo Yushun)"
+        },
+        "date": "<t:1755813600:F>",
+        "image": "https://img.game8.co/4241619/91e0d8bd34b3c6a3d3596fbe06122f50.png/show",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOwWrDMBBE%2F2XOOthO7Ta65VhyKeRYelistSsSSUa7wpSQfy9yU0r7B73NDMPMu2JMJQs%2FO9i2GZrBIAqF5cIC2zeNgTA72G5o%2B32%2Fe9ztDYrwS5Ij8wKrubBBppEdT7BXhJRq3WDOqcS6arAy6TvnTQuTpLhJ9YHvVXJc%2F5ubQQnU1qFUdPJauQADWTaMttuQlIKP9G2XtNbxp6rnogL7UOXqxaVwN6KZlOcPWJw4nlOBgfOiFEc%2BLOq1VAKc6lXJE%2F1KD%2FgZ%2BBuf%2FeUisK9vX%2Bjdv0S%2FfQIrCWvgBwIAAA%3D%3D"
+    },
+    {
+        "name": "Gemini Cup 2025",
+        "number": "2",
+        "track":
+        {
+            "racetrack": "Kyoto",
+            "terrain": "Turf",
+            "distance_type": "Long",
+            "distance_meters": "3200m",
+            "direction": "Right-Handed",
+            "ground": "Firm",
+            "season": "Spring",
+            "weather": "Sunny",
+            "similar": "Tenno Sho (Spring)"
+        },
+        "date": "<t:1757628000:F>",
+        "image": "https://img.game8.co/4254696/e32337b8225cd773fc47e077b09843f0.png/show",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOwWrDMBBE%2F2XOOthO7Ta65VhyKeRYelistSsSSUa7wpSQfy9yU0r7B73NDMPMu2JMJQs%2FO9i2GZrBIAqF5cIC2zeNgTA72G5o%2B32%2Fe9ztDYrwS5Ij8wKrubBBppEdT7BXhJRq3WDOqcS6arAy6TvnTQuTpLhJ9YHvVXJc%2F5ubQQnU1qFUdPJauQADWTaMttuQlIKP9G2XtNbxp6rnogL7UOXqxaVwN6KZlOcPWJw4nlOBgfOiFEc%2BLOq1VAKc6lXJE%2F1KD%2FgZ%2BBuf%2FeUisK9vX%2Bjdv0S%2FfQIrCWvgBwIAAA%3D%3D"
+    },
+    {
+        "name": "Cancer Cup 2025",
+        "number": "3",
+        "track":
+        {
+            "racetrack": "Tokyo",
+            "terrain": "Turf",
+            "distance_type": "Mile",
+            "distance_meters": "1600m",
+            "direction": "Left-Handed",
+            "ground": "Good",
+            "season": "Summer",
+            "weather": "Sunny",
+            "similar": "-"
+        },
+        "date": "<t:1760220000:F> (Estimated)",
+        "image": "https://img.game8.co/4292870/964b31c99b08d94e93717904b4290a23.png/show",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOwWrDMBBE%2F2XOOthOnTa65Vh6KeRYelistStiSUa7wpSQfy9yUkr7B73NDMPMu2BIJQs%2FO9i22TedQRQKy8wC2zeNgTA72G7f9od%2B97g7GBTh1yQvzAus5sIGmQZ2PMJeEFKqdYMppxJvcmXSD86wbZ0jSXGL1Qe%2BV8lx%2FW%2BuBiVQW4dS0dFr5QIMZNkw2m5DUgo%2B0rdd0lrHn6qeigrsQ5WrF5fC3YhmUp4%2BYXHieE4FBs6LUhz4uKjXUglwqlclj%2FQrPeJn4G989vMssG%2FvN%2FTuX6JfvwCECixpBwIAAA%3D%3D"
+    },
+    {
+        "name": "Leo Cup 2025",
+        "number": "4",
+        "track":
+        {
+            "racetrack": "Hanshin",
+            "terrain": "Turf",
+            "distance_type": "Medium",
+            "distance_meters": "2200m",
+            "direction": "Right-Handed",
+            "ground": "Firm",
+            "season": "Summer",
+            "weather": "Sunny",
+            "similar": "-"
+        },
+        "date": "<t:1762034400:F>",
+        "image": "https://img.game8.co/4301378/13ec6fd35be87cd8b2298221be086b57.png/show",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOwWrDMBBE%2F2XOOthOnda65VhyKeRYelistSsSSUa7wpSQfy9yU0r7B73NDMPMu2JMJQs%2FO9i2GZq9QRQKy4UFtm8aA2F2sN2%2B7Yd%2B97gbDIrwS5Ij8wKrubBBppEdT7BXhJRq3WDOqcS6arAy6TvnTQuTpLg11Ae%2BV8lx%2FW9uBiVQW4dS0clr5QIMZNkw2m5DUgo%2B0rdd0lrHn6qeiwrsQ5WrF5fC3YhmUp4%2FYHHieE4FBs6LUhz5sKjXUglwqlclT%2FQrPeBn4G989peLwL6%2BfaF3%2FxL99gn7t0r6BwIAAA%3D%3D"
+    },
+    {
+        "name": "Virgo Cup 2025",
+        "number": "5",
+        "track":
+        {
+            "racetrack": "Hanshin",
+            "terrain": "Turf",
+            "distance_type": "Mile",
+            "distance_meters": "1600m",
+            "direction": "Right-Handed",
+            "ground": "Firm",
+            "season": "Autumn",
+            "weather": "Sunny",
+            "similar": "Mile Championship"
+        },
+        "date": "<t:1763589600:F>",
+        "image": "https://img.game8.co/4259380/45ce916af7479ecebeee705823be1fd7.png/show",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOvU7EMBCE32VqF%2FkhQNxdiWiQrkQUq3gTrDvbkXetCJ3u3ZHDIQRvQDczGs18F0ypZOEnB9s2Y9MbRKGwnllgh6YxEGYH2923wzj0D%2F1oUIRfkjwzr7CaCxtkmtjxDHtBSKnWDZacSqyrBhuTvnPetTBJirC9gfrAtyo5rv%2FN1aAEautQKjp7rVyAgaw7RtvtSErBR%2Fq2a9rq%2BGPVS1GBvaty8%2BJSuBnRTMrLByyOHE%2BpwMB5UYoTH1b1WioBjvWq5Jl%2BpQf8DPyNT%2F58FtjXty%2F07l%2BiXz8BsrA9NwcCAAA%3D"
+    },
+    {
+        "name": "Libra Cup 2025",
+        "number": "6",
+        "track":
+        {
+            "racetrack": "Kyoto",
+            "terrain": "Turf",
+            "distance_type": "Long",
+            "distance_meters": "3000m",
+            "direction": "Right-Handed",
+            "ground": "Firm",
+            "season": "Autumn",
+            "weather": "Sunny",
+            "similar": "Kikuka Sho"
+        },
+        "date": "<t:1766008800:F> (Estimated)",
+        "image": "",
+        "umalator": "https://alpha123.github.io/uma-tools/umalator-global/#H4sIAAAAAAAACtWOvWoDMRCE32VqFfeTS2x1LoObgMuQYjntXYQt6dCuOILxuwddHELyBulmhmHmu2JMJQs%2FO9i22bWNQRQKy4UFdmgaA2F2sN1jO%2ByH%2FqnfGxThlyRH5gVWc2GDTCM7nmCvCCnVusGcU4l11WBl0nfOmxYmSRG2N1Af%2BF4lx%2FW%2FuRmUQG0dSkUnr5ULMJBlw2i7DUkp%2BEjfdklrHd9VPRcV2IcqVy8uhbsRzaQ8f8DixPGcCgycF6U48mFRr6US4FSvSp7oV3rAz8Df%2BOwvF4F9fftC7%2F4l%2Bu0Tn3FECAcCAAA%3D"
+    }
+]
