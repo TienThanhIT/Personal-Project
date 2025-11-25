@@ -98,8 +98,7 @@ def generate_challenge_embed():
         raise ValueError("Uma Musume list is empty. Cannot generate challenge.")
 
     random_uma = random.choice(UMALIST)
-    # FIX: Corrected the number of required support cards to 5 (6 total cards minus 1 borrowed card)
-    random_deck_types = random.choices(TYPE_LIST, k=5) 
+    random_deck_types = random.choices(TYPE_LIST, k=6) 
     # Combine the deck and format the string
     full_deck = random_deck_types
     deck_str = ", ".join(full_deck)
@@ -300,5 +299,6 @@ if token:
     bot.run(token, log_handler=handler)
 else:
     print("Error: Discord token not found. Please ensure 'Discord_token' is set in your .env file.")
+
 
 
