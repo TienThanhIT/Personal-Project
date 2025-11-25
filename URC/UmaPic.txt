@@ -47,3 +47,6 @@ Haru Urara|https://gametora.com/images/umamusume/characters/chara_stand_1052_105
 Matikanefukukitaru|https://gametora.com/images/umamusume/characters/chara_stand_1056_105601.png
 Nice Nature|https://gametora.com/images/umamusume/characters/chara_stand_1060_106001.png
 King Halo|https://gametora.com/images/umamusume/characters/chara_stand_1061_106101.png
+Rice Shower (Halloween)|https://gametora.com/images/umamusume/characters/chara_stand_1030_103002.png
+Super Creek (Halloween)|https://gametora.com/images/umamusume/characters/chara_stand_1045_104502.png
+
