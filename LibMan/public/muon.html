@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thực Hiện Cho Mượn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">Quản Lý Thư Viện</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="/nhap-sach">Nhập Sách</a>
+                <a class="nav-link" href="/doc-gia">Độc Giả</a>
+                <a class="nav-link active" href="/muon-sach">Mượn Sách</a>
+                <a class="nav-link" href="/thong-ke">Báo Cáo</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card mx-auto" style="max-width: 600px;">
+            <div class="card-header bg-warning text-dark">Lập Phiếu Mượn Sách</div>
+            <div class="card-body">
+                <form id="formMuon">
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên người mượn:</label>
+                        <input type="text" id="searchDocGia" class="form-control" autocomplete="off">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Đơn vị công tác:</label>
+                        <input type="text" id="don_vi" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại:</label>
+                        <input type="text" id="sdt" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng:</label>
+                        <input type="text" id="so_luong" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tên sách:</label>
+                        <input type="text" id="tieude" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ngày mượn:</label>
+                        <input type="date" id="ngay_muon" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ngày trả:</label>
+                        <input type="date" id="han_tra" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Xác nhận cho mượn</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputSearch = document.getElementById('searchDocGia');
+        const suggestDiv = document.getElementById('suggestDocGia');
+        const hiddenId = document.getElementById('selected_docgia_id');
+
+        // Gợi ý tên độc giả khi gõ
+        inputSearch.oninput = async () => {
+            const query = inputSearch.value;
+            if (query.length < 2) { suggestDiv.innerHTML = ''; return; }
+
+            const res = await fetch(`/api/tim-doc-gia?name=${query}`);
+            const data = await res.json();
+
+            suggestDiv.innerHTML = data.map(dg => `
+                <button type="button" class="list-group-item list-group-item-action" 
+                        onclick="selectDG('${dg.hoten}', ${dg.docgia_id})">
+                    ${dg.hoten} (ID: ${dg.docgia_id})
+                </button>
+            `).join('');
+        };
+
+        window.selectDG = (name, id) => {
+            inputSearch.value = name;
+            hiddenId.value = id;
+            suggestDiv.innerHTML = '';
+        };
+
+        // Thiết lập giới hạn ngày mượn
+        const ngayMuonInput = document.getElementById('ngay_muon');
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const maxDate = `${currentYear}-${month}-${day}`;
+        const minDate = `${currentYear - 100}-${month}-${day}`;
+        ngayMuonInput.max = maxDate;
+        ngayMuonInput.min = minDate;
+        ngayMuonInput.value = maxDate;
+
+        // Gửi form mượn sách
+       document.getElementById('formMuon').onsubmit = async (e) => {
+        e.preventDefault();
+
+        const ngayMuonVal = document.getElementById('ngay_muon').value;
+        const ngayMuonDate = new Date(ngayMuonVal);
+        const ngayHienTai = new Date();
+        const minNgay = new Date();
+        ngay100NamTruoc.setFullYear(ngayHienTai.getFullYear() - 100);
+
+        // Kiểm tra giới hạn
+        if (ngayMuonDate > ngayHienTai) {
+            alert("Lỗi: Ngày mượn không hợp lệ");
+            return;
+        }
+        if (ngayMuonDate < minNgay) {
+            alert("Lỗi: Ngày mượn không hợp lệ");
+            return;
+        }
+
+        // Kiểm tra Ngày trả > Ngày mượn 
+        const ngayTraVal = document.getElementById('han_tra').value;
+        if (new Date(ngayTraVal) <= ngayMuonDate) {
+            alert("Lỗi: Ngày trả phải sau ngày mượn!");
+            return;
+        }
+        
+        const payload = {
+            book_id: document.getElementById('book_id').value, // Mã sách
+            docgia_id: document.getElementById('selected_docgia_id').value, // ID lấy từ gợi ý
+            ngay_muon: document.getElementById('ngay_muon').value,
+            han_tra: document.getElementById('han_tra').value
+        };
+
+        const res = await fetch('/api/muon-sach', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await res.json();
+        alert(result.message || result.error);
+        if(result.message) location.reload(); // Load lại trang để cập nhật dữ liệu
+    };
+
+        
+    </script>
+</body>
+</html>
