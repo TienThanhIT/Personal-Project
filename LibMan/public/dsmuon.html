@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách mượn sách</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-5">
+        <div class="container">
+            <h3 class="text-center mb-4 text-primary fw-bold">DANH SÁCH THÔNG TIN ĐỘC GIẢ ĐÃ MƯỢN</h3>
+            
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID Phiếu</th>
+                            <th>Người mượn</th>
+                            <th>Sách mượn</th>
+                            <th>Ngày mượn</th>
+                            <th>Hạn trả</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listMuon">
+                        </tbody>
+                </table>
+            </div>
+            <div class="mt-3 text-center">
+                <a href="/muon.html" class="btn btn-secondary">Quay lại trang mượn</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDanhSach() {
+            try {
+                const res = await fetch('/api/danh-sach-muon');
+                if (!res.ok) throw new Error("Không thể lấy dữ liệu từ server");
+                
+                const data = await res.json();
+                const listBody = document.getElementById('listMuon');
+                
+                if (data.length === 0) {
+                    listBody.innerHTML = `<tr><td colspan="7" class="text-center">Hiện chưa có ai mượn sách.</td></tr>`;
+                    return;
+                }
+
+                const html = data.map(item => {
+                    const ngayMuon = new Date(item.ngay_muon).toLocaleDateString('vi-VN');
+                    const hanTra = new Date(item.han_tra).toLocaleDateString('vi-VN');
+                    
+                    const isOverdue = new Date(item.han_tra) < new Date();
+                    const statusClass = isOverdue ? 'badge bg-danger' : 'badge bg-success';
+                    const statusText = isOverdue ? 'Quá hạn' : 'Đang mượn';
+
+                    return `
+                        <tr>
+                            <td>${item.phieu_id}</td>
+                            <td><strong>${item.hoten}</strong><br><small>${item.sdt}</small></td>
+                            <td>${item.tieude}</td>
+                            <td>${ngayMuon}</td>
+                            <td>${hanTra}</td>
+                            <td><span class="${statusClass}">${statusText}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="traSach(${item.phieu_id})">
+                                    Đã trả
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                listBody.innerHTML = html;
+            } catch (err) {
+                console.error("Lỗi:", err);
+                document.getElementById('listMuon').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Lỗi kết nối server!</td></tr>`;
+            }
+        }
+
+        async function traSach(phieuId) {
+            if (!confirm("Xác nhận người này đã trả sách?")) return;
+            try {
+                const res = await fetch('/api/tra-sach', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ phieu_id: phieuId })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert(result.message);
+                    loadDanhSach();
+                } else {
+                    alert("Lỗi: " + result.error);
+                }
+            } catch (err) {
+                alert("Không thể kết nối đến máy chủ!");
+            }
+        }
+
+        loadDanhSach();
+    </script>
+</body>
+</html>
