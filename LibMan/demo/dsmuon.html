@@ -8,56 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-            margin: 0;
-        }
-        /* SIDEBAR STYLES */
-        #sidebar {
-            width: 250px;
-            background: #2c3e50;
-            color: white;
-            position: fixed;
-            height: 100%;
-            z-index: 1000;
-        }
-        #sidebar .sidebar-header {
-            padding: 20px;
-            background: #1a252f;
-            text-align: center;
-        }
-        #sidebar ul.components {
-            padding: 20px 0;
-        }
-        #sidebar ul li a {
-            padding: 15px 25px;
-            display: block;
-            color: #bdc3c7;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        #sidebar ul li a:hover {
-            background: #34495e;
-            color: white;
-        }
-        #sidebar ul li.active > a {
-            background: #3498db;
-            color: white;
-        }
-        /* MAIN CONTENT STYLES */
-        .main-content {
-            margin-left: 250px; /* Đẩy nội dung sang phải để tránh bị Sidebar đè */
-            width: calc(100% - 250px);
-            padding: 40px;
-        }
-        .table-container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        }
+        body { display: flex; min-height: 100vh; background-color: #f8f9fa; margin: 0; }
+        #sidebar { width: 250px; background: #2c3e50; color: white; position: fixed; height: 100%; z-index: 1000; }
+        #sidebar .sidebar-header { padding: 20px; background: #1a252f; text-align: center; }
+        #sidebar ul.components { padding: 20px 0; }
+        #sidebar ul li a { padding: 15px 25px; display: block; color: #bdc3c7; text-decoration: none; transition: 0.3s; }
+        #sidebar ul li a:hover { background: #34495e; color: white; }
+        #sidebar ul li.active > a { background: #3498db; color: white; }
+        .main-content { margin-left: 250px; width: calc(100% - 250px); padding: 40px; }
+        .table-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -92,30 +51,26 @@
                             <th class="text-center">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody id="listMuon">
-                        </tbody>
+                    <tbody id="listMuon"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
+        // Cấu hình Toast thông báo nhỏ
         const Toast = Swal.mixin({
-    toast: true,
-    position: 'bottom-end', // Vị trí góc phải dưới
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-    }
-});
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
+        // Hàm tải danh sách
         async function loadDanhSach() {
             try {
                 const res = await fetch('/api/danh-sach-muon');
-                if (!res.ok) throw new Error("Lỗi API");
-                
                 const data = await res.json();
                 const listBody = document.getElementById('listMuon');
                 
@@ -125,9 +80,8 @@
                 }
 
                 const html = data.map(item => {
-                    const ngayMuon = new Date(item.ngay_muon).toLocaleDateString('vi-VN');
-                    const hanTra = new Date(item.han_tra).toLocaleDateString('vi-VN');
-                    const isOverdue = new Date(item.han_tra) < new Date();
+                    const dHanTra = new Date(item.han_tra);
+                    const isOverdue = dHanTra < new Date() && item.trang_thai !== 'Đã trả';
                     
                     const statusClass = isOverdue ? 'badge bg-danger' : 'badge bg-success';
                     const statusText = isOverdue ? 'Quá hạn' : 'Đang mượn';
@@ -140,39 +94,36 @@
                                 <small class="text-muted">${item.sdt}</small>
                             </td>
                             <td>${item.tieude}</td>
-                            <td>${ngayMuon}</td>
-                            <td>${hanTra}</td>
+                            <td>${new Date(item.ngay_muon).toLocaleDateString('vi-VN')}</td>
+                            <td>${dHanTra.toLocaleDateString('vi-VN')}</td>
                             <td><span class="${statusClass}">${statusText}</span></td>
                             <td class="text-center">
                                 <button class="btn btn-sm btn-outline-primary" onclick="traSach(${item.phieu_id})">
                                     <i class="bi bi-check2-circle"></i> Trả sách
                                 </button>
                             </td>
-                        </tr>
-                    `;
+                        </tr>`;
                 }).join('');
                 
                 listBody.innerHTML = html;
             } catch (err) {
-                console.error(err);
-                document.getElementById('listMuon').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Không thể kết nối Server!</td></tr>`;
+                document.getElementById('listMuon').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Lỗi kết nối Server!</td></tr>`;
             }
         }
 
-        async function xacNhanTraSach(phieu_id) {
-            // Hiển thị pop-up giữa màn hình
+        // Hàm xử lý trả sách với Pop-up xác nhận giữa màn hình
+        async function traSach(phieu_id) {
             const result = await Swal.fire({
                 title: 'Xác nhận trả sách?',
-                text: "Bạn có chắc chắn độc giả đã hoàn trả cuốn sách này?",
+                text: "Hệ thống sẽ ghi nhận sách đã được hoàn trả và cập nhật kho.",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#2e7d32', // Màu xanh lá
-                cancelButtonColor: '#d33',    // Màu đỏ
-                confirmButtonText: 'Vâng, đã trả!',
-                cancelButtonText: 'Chưa, bấm nhầm'
+                confirmButtonColor: '#2e7d32',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Hủy'
             });
 
-            // Nếu người dùng bấm "Vâng, đã trả!"
             if (result.isConfirmed) {
                 try {
                     const res = await fetch('/api/tra-sach', {
@@ -182,20 +133,22 @@
                     });
 
                     if (res.ok) {
-                        // Hiển thị thông báo thành công sau khi xử lý xong
-                        Swal.fire(
-                            'Thành công!',
-                            'Sách đã được đưa trở lại kho.',
-                            'success'
-                        );
-                        loadDanhSachMuon(); // Tải lại bảng dữ liệu
+                        // Hiện thông báo nhỏ thành công ở góc phải
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Đã cập nhật trạng thái trả sách!'
+                        });
+                        loadDanhSach(); // Tải lại bảng
+                    } else {
+                        throw new Error();
                     }
                 } catch (error) {
-                    Swal.fire('Lỗi!', 'Không thể kết nối đến server.', 'error');
+                    Swal.fire('Lỗi!', 'Không thể thực hiện thao tác trả sách.', 'error');
                 }
             }
         }
 
+        // Chạy hàm khi load trang
         loadDanhSach();
     </script>
 </body>

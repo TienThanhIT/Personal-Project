@@ -7,6 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    
     <style>
         body { display: flex; min-height: 100vh; background-color: #f8f9fa; margin: 0; }
         #sidebar { width: 250px; background: #2c3e50; color: white; position: fixed; height: 100%; z-index: 1000; }
@@ -21,7 +23,6 @@
         .table thead { background-color: #f1f3f5; }
         .search-box { max-width: 400px; margin-bottom: 20px; }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 </head>
 <body>
 
@@ -44,27 +45,26 @@
     </div>
 
     <div class="card p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        
-        <div class="search-box mb-0" style="flex-grow: 1; max-width: 400px;">
-            <div class="input-group">
-                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                <input type="text" id="searchInKho" class="form-control" placeholder="Tìm tên sách, mã sách, tác giả...">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="search-box mb-0" style="flex-grow: 1; max-width: 400px;">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInKho" class="form-control" placeholder="Tìm tên sách, mã sách, tác giả...">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 ms-3">
+                <button onclick="exportKhoSach()" class="btn btn-success d-flex align-items-center">
+                    <i class="bi bi-file-earmark-excel me-2"></i> Xuất Excel
+                </button>
+                <a href="/nhapsach.html" class="btn btn-primary d-flex align-items-center">
+                    <i class="bi bi-plus-lg me-2"></i> Thêm sách mới
+                </a>
             </div>
         </div>
 
-        <div class="d-flex gap-2 ms-3">
-            <button onclick="exportKhoSach()" class="btn btn-success d-flex align-items-center">
-                <i class="bi bi-file-earmark-excel me-2"></i> Xuất Excel Kho Sách
-            </button>
-            <a href="/nhapsach.html" class="btn btn-success d-flex align-items-center">
-                <i class="bi bi-plus-lg me-2"></i> Thêm sách mới
-            </a>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
                         <th>Mã sách</th>
@@ -130,37 +130,40 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // 1. Cấu hình Toast
     const Toast = Swal.mixin({
-    toast: true,
-    position: 'bottom-end', // Vị trí góc phải dưới
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-    }
-});
-    let modalInstance; // Khai báo biến global để dùng chung
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 
-    // Đợi HTML tải xong mới khởi tạo Modal
+    let modalInstance;
+
+    // 2. Khởi tạo trang
     window.onload = function() {
         modalInstance = new bootstrap.Modal(document.getElementById('editModal'));
         loadBooks();
     };
 
+    // 3. Tải dữ liệu từ API
     async function loadBooks() {
         try {
             const res = await fetch('/api/kho-sach');
             const books = await res.json();
             renderTable(books);
-        } catch (err) { console.error("Lỗi tải dữ liệu:", err); }
+        } catch (err) {
+            console.error("Lỗi:", err);
+            Toast.fire({ icon: 'error', title: 'Không thể tải dữ liệu kho!' });
+        }
     }
 
+    // 4. Hiển thị bảng dữ liệu
     function renderTable(data) {
         const body = document.getElementById('bookTableBody');
         if (!data || data.length === 0) {
-            body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Kho trống</td></tr>`;
+            body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">Kho sách trống</td></tr>`;
             return;
         }
         
@@ -184,16 +187,18 @@
         `).join('');
     }
 
+    // 5. Mở modal chỉnh sửa
     function openEditModal(book) {
         document.getElementById('edit_book_id').value = book.book_id;
         document.getElementById('edit_tieude').value = book.tieude;
-        document.getElementById('edit_theloai').value = book.theloai;
-        document.getElementById('edit_tacgia').value = book.tacgia;
+        document.getElementById('edit_theloai').value = book.theloai || '';
+        document.getElementById('edit_tacgia').value = book.tacgia || '';
         document.getElementById('edit_tongso').value = book.tongso;
         document.getElementById('edit_conlai').value = book.conlai;
-        modalInstance.show(); // Dùng instance đã khởi tạo
+        modalInstance.show();
     }
 
+    // 6. Lưu dữ liệu đã sửa
     async function saveEdit() {
         const id = document.getElementById('edit_book_id').value;
         const payload = {
@@ -211,28 +216,46 @@
                 body: JSON.stringify(payload)
             });
             if (res.ok) {
-                Toast.fire("Cập nhật thành công!");
+                Toast.fire({ icon: 'success', title: 'Đã cập nhật thông tin!' });
                 modalInstance.hide();
                 loadBooks();
-            } else { Toast.fire("Lỗi khi cập nhật!"); }
-        } catch (err) { Toast.fire("Lỗi kết nối!"); }
-    }
-
-    async function deleteBook(id) {
-        if (!confirm(`Bạn có chắc chắn muốn xóa sách mã: ${id}?`)) return;
-        try {
-            const res = await fetch(`/api/xoa-sach/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                Toast.fire("Đã xóa sách!");
-                loadBooks();
             } else {
-                const error = await res.json();
-                Toast.fire(error.error || "Không thể xóa!");
+                Toast.fire({ icon: 'error', title: 'Lỗi khi lưu dữ liệu!' });
             }
-        } catch (err) { Toast.fire("Lỗi kết nối!"); }
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Lỗi kết nối Server!' });
+        }
     }
 
-    // Tìm kiếm nhanh
+    // 7. Xóa sách
+    async function deleteBook(book_id) {
+        const result = await Swal.fire({
+            title: 'Xác nhận xóa?',
+            text: "Dữ liệu sách này sẽ bị xóa vĩnh viễn!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Đúng, xóa nó!',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`/api/xoa-sach/${book_id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    Swal.fire('Thành công!', 'Sách đã được xóa khỏi kho.', 'success');
+                    loadBooks();
+                } else {
+                    Swal.fire('Lỗi!', 'Không thể xóa sách đang có người mượn.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Lỗi!', 'Lỗi kết nối hệ thống.', 'error');
+            }
+        }
+    }
+
+    // 8. Tìm kiếm nhanh
     document.getElementById('searchInKho').oninput = function(e) {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('#bookTableBody tr').forEach(row => {
@@ -240,63 +263,49 @@
         });
     };
 
+    // 9. Xuất Excel
     async function exportKhoSach() {
-    try {
-        const res = await fetch('/api/kho-sach');
-        const data = await res.json();
-        if (data.length === 0) return Toast.fire("Kho sách hiện đang trống!");
+        try {
+            const res = await fetch('/api/kho-sach');
+            const data = await res.json();
+            if (data.length === 0) return Toast.fire({ icon: 'warning', title: 'Không có dữ liệu!' });
 
-        // 1. Chuẩn bị dữ liệu cho Excel
-        const excelData = data.map(item => ({
-            "Mã sách": item.book_id,
-            "Tiêu đề": item.tieude,
-            "Thể loại": item.theloai || "N/A",
-            "Tác giả": item.tacgia || "N/A",
-            "NXB": item.nxb || "N/A",
-            "Năm XB": item.namxb || "N/A",
-            "Tổng số": item.tongso,
-            "Còn lại": item.conlai
-        }));
+            const excelData = data.map(item => ({
+                "Mã sách": item.book_id,
+                "Tiêu đề": item.tieude,
+                "Thể loại": item.theloai || "N/A",
+                "Tác giả": item.tacgia || "N/A",
+                "Tổng số": item.tongso,
+                "Còn lại": item.conlai
+            }));
 
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        const range = XLSX.utils.decode_range(worksheet['!ref']);
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            
+            // Định dạng Header căn giữa, màu xanh
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const addr = XLSX.utils.encode_cell({ r: 0, c: C });
+                worksheet[addr].s = {
+                    alignment: { horizontal: "center", vertical: "center" },
+                    font: { bold: true, color: { rgb: "FFFFFF" } },
+                    fill: { fgColor: { rgb: "206095" } }
+                };
+            }
 
-        // 2. Định dạng Header (Dòng đầu tiên)
-        for (let C = range.s.c; C <= range.e.c; ++C) {
-            const address = XLSX.utils.encode_cell({ r: 0, c: C });
-            if (!worksheet[address]) continue;
+            // Auto-fit cột
+            worksheet['!cols'] = Object.keys(excelData[0]).map(key => ({ width: 20 }));
 
-            worksheet[address].s = {
-                alignment: { horizontal: "center", vertical: "center" },
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: "206095" } } // Màu xanh dương chuyên nghiệp cho kho sách
-            };
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Kho Sách");
+            
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(workbook, `Kho_Sach_${dateStr}.xlsx`);
+            Toast.fire({ icon: 'success', title: 'Đã xuất Excel!' });
+
+        } catch (err) {
+            Toast.fire({ icon: 'error', title: 'Lỗi xuất file!' });
         }
-
-        // 3. Tự động điều chỉnh độ rộng cột (Auto-fit)
-        const colWidths = [];
-        excelData.forEach(row => {
-            Object.keys(row).forEach((key, i) => {
-                const value = row[key] ? row[key].toString() : "";
-                const maxLen = Math.max(key.length, value.length);
-                colWidths[i] = Math.max(colWidths[i] || 0, maxLen);
-            });
-        });
-        worksheet['!cols'] = colWidths.map(w => ({ width: w + 5 }));
-
-        // 4. Tạo Workbook và xuất file
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Kho Sách");
-
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-        XLSX.writeFile(workbook, `Bao_Cao_Kho_Sach_${dateStr}.xlsx`);
-
-    } catch (err) {
-        console.error(err);
-        Toast.fire("Lỗi khi xuất file kho sách!");
     }
-}
 </script>
 
 </body>

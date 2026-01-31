@@ -120,6 +120,9 @@
                     <button type="submit" class="btn btn-success py-2 fw-bold">
                         <i class="bi bi-save"></i> Lưu vào kho
                     </button>
+                    <a href="/khosach.html" class="btn btn-outline-secondary py-2 fw-bold">
+                        <i class="bi bi-arrow-left-circle"></i> Quay lại kho sách
+                    </a>
                 </div>
             </form>
         </div>
@@ -127,42 +130,59 @@
 </div>
 
 <script>
-    const Toast = Swal.mixin({
-    toast: true,
-    position: 'bottom-end', // Vị trí góc phải dưới
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-    }
-});
-    // Giữ nguyên phần script xử lý API của bạn
-    document.getElementById('formNhapSach').onsubmit = async (e) => {
-        e.preventDefault();
-        const payload = {
-            book_id: document.getElementById('book_id').value,
-            tieude: document.getElementById('tieude').value,
-            theloai: document.getElementById('theloai').value,
-            tacgia: document.getElementById('tacgia').value,
-            nxb: document.getElementById('nxb').value,
-            namxb: document.getElementById('namxb').value,
-            tongso: parseInt(document.getElementById('tongso').value)
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        document.getElementById('formNhapSach').onsubmit = async (e) => {
+            e.preventDefault();
+            const payload = {
+                book_id: document.getElementById('book_id').value,
+                tieude: document.getElementById('tieude').value,
+                theloai: document.getElementById('theloai').value,
+                tacgia: document.getElementById('tacgia').value,
+                nxb: document.getElementById('nxb').value,
+                namxb: document.getElementById('namxb').value,
+                tongso: parseInt(document.getElementById('tongso').value)
+            };
+            
+            try {
+                const res = await fetch('/api/nhap-sach', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                if (res.ok) {
+                    // Hiển thị Toast thành công có icon
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Đã nhập sách thành công!'
+                    });
+                    document.getElementById('formNhapSach').reset();
+                } else { 
+                    // Hiển thị Toast lỗi có icon
+                    Toast.fire({
+                        icon: 'error',
+                        title: result.error || 'Lỗi khi nhập sách!'
+                    });
+                }
+            } catch (err) { 
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối Server!'
+                }); 
+            }
         };
-        try {
-            const res = await fetch('/api/nhap-sach', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-            const result = await res.json();
-            if (res.ok) {
-                Toast.fire("Thành công: " + result.message);
-                document.getElementById('formNhapSach').reset();
-            } else { Toast.fire(result.error); }
-        } catch (err) { Toast.fire("Lỗi kết nối!"); }
-    };
-</script>
+    </script>
 </body>
 </html>
