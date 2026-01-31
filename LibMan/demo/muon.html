@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mượn sách - BookLib</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        /* SIDEBAR */
+        #sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a252f;
+            text-align: center;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+        #sidebar ul li a {
+            padding: 15px 25px;
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        #sidebar ul li a:hover {
+            background: #34495e;
+            color: white;
+        }
+        #sidebar ul li.active > a {
+            background: #3498db;
+            color: white;
+        }
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 40px;
+        }
+        .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 12px; }
+        .suggest-box { position: absolute; width: 100%; z-index: 1000; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="bi bi-book-half"></i> BookLib</h4>
+        </div>
+        <ul class="list-unstyled components">
+            <li class="active"><a href="/muon.html"><i class="bi bi-person-plus-fill"></i> Cho mượn sách</a></li>
+            <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
+            <li><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
+            <li><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
+            <hr class="mx-3 border-secondary">
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="card mx-auto" style="max-width: 650px;">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> THÔNG TIN ĐỘC GIẢ</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="formMuon">
+                        <div class="mb-3 position-relative">
+                            <label class="form-label fw-bold">Họ và tên người mượn:</label>
+                            <input type="text" id="searchDocGia" class="form-control" placeholder="Nhập tên để tìm hoặc thêm mới" autocomplete="off" required>
+                            <input type="hidden" id="selected_docgia_id">
+                            <div id="suggestDocGia" class="list-group suggest-box"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Đơn vị công tác:</label>
+                                <input type="text" id="don_vi" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại:</label>
+                                <input type="text" id="sdt" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Mã sách:</label>
+                                <input type="text" id="book_id" class="form-control" placeholder="Mã sách trong kho" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số lượng mượn:</label>
+                                <input type="number" id="so_luong" class="form-control" value="1" min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Hạn trả sách:</label>
+                            <input type="date" id="han_tra" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                            <i class="bi bi-check-circle"></i> Xác nhận cho mượn
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-end', // Vị trí góc phải dưới
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
+        const inputSearch = document.getElementById('searchDocGia');
+        const suggestDiv = document.getElementById('suggestDocGia');
+        const hiddenId = document.getElementById('selected_docgia_id');
+
+        // 1. Gợi ý độc giả khi gõ tên
+        inputSearch.oninput = async () => {
+            const query = inputSearch.value;
+            if (query.length < 2) { suggestDiv.innerHTML = ''; return; }
+            try {
+                const res = await fetch(`/api/tim-doc-gia?name=${query}`);
+                const data = await res.json();
+                suggestDiv.innerHTML = data.map(dg => `
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="selectDG('${dg.hoten}', ${dg.docgia_id}, '${dg.donvi}', '${dg.sdt}')">
+                        <i class="bi bi-person"></i> ${dg.hoten} - ${dg.donvi}
+                    </button>
+                `).join('');
+            } catch (err) { console.log("Lỗi gợi ý"); }
+        };
+
+        window.selectDG = (name, id, donvi, sdt) => {
+            inputSearch.value = name;
+            hiddenId.value = id;
+            document.getElementById('don_vi').value = donvi || '';
+            document.getElementById('sdt').value = sdt || '';
+            suggestDiv.innerHTML = '';
+        };
+
+        // 2. Tự động điền ngày trả mặc định (7 ngày sau)
+        const hanTraInput = document.getElementById('han_tra');
+        const today = new Date();
+        const defaultReturnDate = new Date();
+        defaultReturnDate.setDate(today.getDate() + 7);
+        
+        hanTraInput.value = defaultReturnDate.toISOString().split('T')[0];
+        hanTraInput.min = today.toISOString().split('T')[0]; 
+
+        // 3. Xử lý gửi FORM
+        document.getElementById('formMuon').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                hoten: inputSearch.value,
+                don_vi: document.getElementById('don_vi').value,
+                sdt: document.getElementById('sdt').value,
+                so_luong: document.getElementById('so_luong').value,
+                book_id: document.getElementById('book_id').value, 
+                han_tra: hanTraInput.value
+            };
+
+            try {
+                const res = await fetch('/api/muon-sach', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                if (res.ok) {
+                    Toast.fire("Đã xác nhận mượn sách thành công!");
+                    document.getElementById('formMuon').reset();
+                    hiddenId.value = '';
+                } else {
+                    Toast.fire("Lỗi: " + result.error);
+                }
+            } catch (err) {
+                Toast.fire("Không thể kết nối đến Server!");
+            }
+        };
+
+        // Đóng hộp gợi ý khi click ra ngoài
+        document.addEventListener('click', function (e) {
+            if (e.target !== inputSearch) suggestDiv.innerHTML = '';
+        });
+    </script>
+</body>
+</html>

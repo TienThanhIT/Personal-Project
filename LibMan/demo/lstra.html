@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử trả sách</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        #sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a252f;
+            text-align: center;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+        #sidebar ul li a {
+            padding: 15px 25px;
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        #sidebar ul li a:hover {
+            background: #34495e;
+            color: white;
+        }
+        #sidebar ul li.active > a {
+            background: #3498db;
+            color: white;
+        }
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 40px;
+        }
+        .table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="bi bi-book-half"></i> BookLib</h4>
+        </div>
+        <ul class="list-unstyled components">
+            <li><a href="/muon.html"><i class="bi bi-person-plus-fill"></i> Cho mượn sách</a></li>
+            <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
+            <li class="active"><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
+            <li><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
+            <hr class="mx-3 border-secondary">
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="container-fluid">
+            <h3 class="text-center mb-4 text-success fw-bold">DANH SÁCH ĐỘC GIẢ ĐÃ TRẢ</h3>
+            
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Người mượn</th>
+                                <th>Mã sách</th>
+                                <th>Tên sách</th>
+                                <th>Ngày mượn</th>
+                                <th>Hạn trả</th>
+                                <th>Ngày trả thực tế</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listDaTra">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                        <button onclick="exportLichSu()" class="btn btn-success px-4 fw-bold shadow-sm">
+                            <i class="bi bi-file-earmark-excel me-2"></i> Xuất file Excel (.xlsx)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-end', // Vị trí góc phải dưới
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
+        async function loadLichSu() {
+        try {
+            const res = await fetch('/api/lich-su-tra');
+            if (!res.ok) throw new Error("Lỗi tải dữ liệu");
+            
+            const data = await res.json();
+            console.log("Dữ liệu nhận được từ API:", data); // Dùng để kiểm tra lỗi ở F12
+
+            const listBody = document.getElementById('listDaTra');
+            
+            if (!data || data.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Chưa có lịch sử trả sách nào.</td></tr>`;
+                return;
+            }
+
+            const html = data.map(item => {
+                // Kiểm tra và ép kiểu ngày tháng an toàn
+                const dMuon = item.ngay_muon ? new Date(item.ngay_muon) : null;
+                const dHan = item.han_tra ? new Date(item.han_tra) : null;
+                const dThuc = item.ngay_tra_thuc_te ? new Date(item.ngay_tra_thuc_te) : null;
+
+                if (!dThuc) return ''; // Bỏ qua nếu dòng này chưa thực sự trả
+
+                // Logic so sánh ngày (bỏ qua giờ)
+                const isLate = dThuc.setHours(0,0,0,0) > dHan.setHours(0,0,0,0);
+                
+                const color = isLate ? 'text-danger' : 'text-success';
+                const note = isLate ? 'Trả muộn' : 'Đúng hạn';
+                const badgeClass = isLate ? 'bg-danger' : 'bg-success';
+                const iconClass = isLate ? 'bi-exclamation-triangle' : 'bi-check-circle';
+
+                // Lưu ý: Đảm bảo tên cột (item.hoten, item.tieude) khớp với kết quả JOIN ở Server
+                return `
+                    <tr>
+                        <td><strong>${item.hoten || 'N/A'}</strong></td>
+                        <td><span class="badge bg-light text-dark border">${item.book_id}</span></td>
+                        <td>${item.tieude || 'N/A'}</td>
+                        <td>${dMuon ? dMuon.toLocaleDateString('vi-VN') : '-'}</td>
+                        <td>${dHan ? dHan.toLocaleDateString('vi-VN') : '-'}</td>
+                        <td class="${color} fw-bold">${dThuc.toLocaleDateString('vi-VN')}</td>
+                        <td>
+                            <span class="badge ${badgeClass}">
+                                <i class="bi ${iconClass}"></i> ${note}
+                            </span>
+                        </td>
+                    </tr>`;
+            }).join('');
+            
+            listBody.innerHTML = html;
+        } catch (err) {
+            console.error("Lỗi:", err);
+            document.getElementById('listDaTra').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Lỗi kết nối server!</td></tr>`;
+        }
+    }
+
+    loadLichSu();
+
+    // Hàm xuất Excel giữ nguyên logic nhưng bổ sung kiểm tra dữ liệu
+    async function exportLichSu() {
+    try {
+        const res = await fetch('/api/lich-su-tra');
+        const data = await res.json();
+        if (data.length === 0) return Toast.fire("Không có dữ liệu để xuất!");
+
+        const excelData = data.map(item => ({
+            "Họ tên độc giả": item.hoten,
+            "Mã sách": item.book_id,
+            "Tên sách": item.tieude,
+            "Ngày mượn": new Date(item.ngay_muon).toLocaleDateString('vi-VN'),
+            "Hạn trả": new Date(item.han_tra).toLocaleDateString('vi-VN'),
+            "Ngày trả thực tế": new Date(item.ngay_tra_thuc_te).toLocaleDateString('vi-VN'),
+            "Trạng thái": (new Date(item.ngay_tra_thuc_te).setHours(0,0,0,0) > new Date(item.han_tra).setHours(0,0,0,0)) ? 'Trả muộn' : 'Đúng hạn'
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+
+        // --- Duyệt qua từng ô để định dạng ---
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const address = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!worksheet[address]) continue;
+
+                // 1. CĂN GIỮ CHO HEADER (Dòng 0)
+                if (R === 0) {
+                    worksheet[address].s = {
+                        alignment: { horizontal: "center", vertical: "center" },
+                        font: { bold: true, color: { rgb: "FFFFFF" } },
+                        fill: { fgColor: { rgb: "2E7D32" } } // Nền xanh lá cho header
+                    };
+                } else {
+                    // 2. TÔ ĐỎ DÒNG TRẢ MUỘN
+                    // Cột "Trạng thái" thường là cột cuối cùng (cột index 6)
+                    const statusCell = worksheet[XLSX.utils.encode_cell({ r: R, c: 6 })];
+                    if (statusCell && statusCell.v === "Trả muộn") {
+                        worksheet[address].s = {
+                            font: { color: { rgb: "FF0000" }, bold: true }, // Chữ đỏ đậm
+                            alignment: { vertical: "center" }
+                        };
+                    }
+                }
+            }
+        }
+
+        // Tự động chỉnh độ rộng cột
+        const objectMaxLength = [];
+        excelData.forEach((row) => {
+            Object.keys(row).forEach((key, index) => {
+                const value = row[key] ? row[key].toString() : "";
+                const maxLen = Math.max(key.length, value.length);
+                objectMaxLength[index] = Math.max(objectMaxLength[index] || 0, maxLen);
+            });
+        });
+        worksheet['!cols'] = objectMaxLength.map(w => ({ width: w + 5 }));
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Lịch sử");
+
+        // Tên file kèm ngày tạo
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+        XLSX.writeFile(workbook, `Bao_Cao_Tra_Sach_${dateStr}.xlsx`);
+
+    } catch (err) {
+        console.error(err);
+        Toast.fire("Lỗi xuất file!");
+    }
+}
+
+    </script>
+</body>
+</html>

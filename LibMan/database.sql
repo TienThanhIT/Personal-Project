@@ -10,7 +10,7 @@ CREATE TABLE sach (
     nxb VARCHAR(255),
     namxb YEAR,
     tongso INT DEFAULT 0,
-    conlai INT DEFAULT 0,
+    conlai INT DEFAULT 0
 );
 
 -- 2. Bảng lưu trữ thông tin độc giả
@@ -18,7 +18,7 @@ CREATE TABLE docgia (
     docgia_id INT PRIMARY KEY AUTO_INCREMENT, 
     hoten VARCHAR(255) NOT NULL,
     donvi VARCHAR(255),
-    sdt VARCHAR(11),
+    sdt VARCHAR(15)
 );
 
 -- 3. Bảng quản lý mượn trả
