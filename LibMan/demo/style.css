@@ -1,6 +1,7 @@
 /* --- BIẾN TOÀN CỤC --- */
 :root {
     --sidebar-width: 250px;
+    --header-height: 150px;
     --primary-color: #0d6efd;
     --danger-color: #ff4d4f;
 }
@@ -9,6 +10,10 @@ body {
     background-color: #f4f7f6;
     font-family: 'Segoe UI', system-ui, sans-serif;
     margin: 0;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- ĐẦU TRANG CỐ ĐỊNH --- */
@@ -18,9 +23,9 @@ body {
     left: 0;
     width: 100%;
     height: 150px; /* Chiều cao tiêu đề */
-    background: hsl(315, 84%, 65%);
+    background: hwb(192 29% 11%);
     color: white;
-    z-index: 9999; /* Cao hơn Sidebar để hiện tràn lề ngang */
+    z-index: 1001; /* Cao hơn Sidebar để hiện tràn lề ngang */
     display: flex;
     align-items: center;
     padding: 0 40px;
@@ -39,8 +44,9 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    padding-top: 150px;
-    min-height: 100%;
+    padding-top: 150px; 
+    height: 100%;
+    min-height: 100vh;
     background: #fff;
     border-right: 1px solid #ddd;
     z-index: 1000;
@@ -53,9 +59,29 @@ body {
 /* --- NỘI DUNG CHÍNH --- */
 .main-content {
     margin-left: var(--sidebar-width);
-    margin-top: 150px;
+    margin-top: var(--header-height);
     padding: 30px;
-    min-height: calc(100vh - 150px);
+    min-height: calc(100vh - var(--header-height));
+    display: block;
+    background-color: #f8f9fa;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-content.flex-center {
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    min-height: calc(100vh - var(--header-height)); 
+    padding: 20px; 
+}
+
+.flex-center .card {
+    margin: 0 !important;
 }
 
 .dashboard-container {
@@ -77,7 +103,24 @@ body {
     overflow: visible !important;
 }
 
+/* Đổi màu tiêu đề tháng */
+.fc .fc-toolbar-title {
+    color: #198754; 
+    font-weight: bold;
+    text-transform: capitalize;
+}
 
+/* Đổi màu icon mũi tên điều hướng sang màu xanh */
+.fc .fc-button-primary {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #198754 !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #f8f9fa !important;
+    color: #146c43 !important;
+}
 
 /* Ép 6 hàng cân đối */
 .fc .fc-daygrid-day-frame {
@@ -85,8 +128,6 @@ body {
     overflow: visible !important;
     position: relative !important;
 }
-
-
 
 /* CHẤM ĐỎ CẢNH BÁO */
 .fc-daygrid-day.has-deadline {
@@ -102,20 +143,16 @@ body {
     height: 10px;
     background-color: var(--danger-color) !important;
     border-radius: 50%;
-    border: 2px solid white; /* Viền trắng tách biệt với màu nền xanh ngày 2/2 */
-    z-index: 9999 !important; /* Đảm bảo nổi trên tất cả các lớp của FullCalendar */
+    border: 2px solid white;
+    z-index: 9999 !important; 
     pointer-events: none;
     display: block !important;
 }
-
-
 
 /* Màu nền ngày hiện tại 2/2 */
 .fc-day-today {
     background-color: #ebf5ff !important;
 }
-
-
 
 /* Làm mờ các ngày của tháng trước/sau */
 .fc-day-other {
@@ -125,8 +162,6 @@ body {
 .fc-day-other .fc-daygrid-day-number {
     color: lch(57.94% 55.44 275.09) ;
 }
-
-
 
 /* TOOLTIP */
 #calendar-tooltip {
@@ -140,8 +175,6 @@ body {
     pointer-events: none;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
-
-
 
 .huge-toast {
     width: 800px !important;

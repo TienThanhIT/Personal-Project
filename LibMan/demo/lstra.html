@@ -96,7 +96,6 @@
 
                 // Logic so sánh ngày (bỏ qua giờ)
                 const isLate = dThuc.setHours(0,0,0,0) > dHan.setHours(0,0,0,0);
-                
                 const color = isLate ? 'text-danger' : 'text-success';
                 const note = isLate ? 'Trả muộn' : 'Đúng hạn';
                 const badgeClass = isLate ? 'bg-danger' : 'bg-success';

@@ -50,7 +50,7 @@
         </div>
 
         <div class="calendar-section">
-            <h6 class="fw-bold mb-3"><i class="bi bi-calendar3"></i> Hạn trả sách</h6>
+            <h6 class="text-success fw-bold"><i class="bi bi-calendar3"></i> Hạn trả sách</h6>
             <div id="calendar"></div>
         </div>
     </div>
@@ -110,7 +110,7 @@
                     toast: true,
                     position: 'bottom-end',
                     icon: 'warning',
-                    title: `Có ${upcoming.length} quyển sách sắp quá hạn trả!`,
+                    title: `Có ${upcoming.length} phiếu mượn sắp quá hạn!`,
                     showConfirmButton: false,
                     timer: 5000,
                     timerProgressBar: true,
@@ -132,6 +132,7 @@
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'vi',
+            titleFormat: { month: '2-digit', year: 'numeric' },
             height: 'auto',
             firstDay: 1, 
             initialDate: todayStr,
