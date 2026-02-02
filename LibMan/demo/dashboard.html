@@ -12,6 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
 <body>
+<header class="web-header">
+    <div class="header-content">
+        <h1 class="logo">THƯ VIỆN TRƯỜNG CHÍNH TRỊ CẦN THƠ</h1>
+    </div>
+</header>
 
 <nav id="sidebar">
     <ul class="list-unstyled components">
@@ -81,9 +86,6 @@
                 });
             } catch (e) {
                 // Dữ liệu giả định để test khi API lỗi
-                eventsDataRaw = [
-                    { hoten: "Phạm Tiến Thành", han_tra: "2026-02-03", tieude: "Truyện Kiều" }
-                ];
                 return eventsDataRaw.map(item => ({ title: item.hoten, start: item.han_tra, description: item.tieude }));
             }
         }

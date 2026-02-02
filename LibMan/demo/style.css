@@ -11,15 +11,41 @@ body {
     margin: 0;
 }
 
+/* --- ĐẦU TRANG CỐ ĐỊNH --- */
+.web-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 150px; /* Chiều cao tiêu đề */
+    background: hsl(315, 84%, 65%);
+    color: white;
+    z-index: 9999; /* Cao hơn Sidebar để hiện tràn lề ngang */
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
 /* --- SIDEBAR --- */
 #sidebar {
     width: var(--sidebar-width);
-    position: fixed;
-    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding-top: 150px;
+    min-height: 100%;
     background: #fff;
     border-right: 1px solid #ddd;
     z-index: 1000;
 }
+
 #sidebar ul.components { padding: 20px 0; list-style: none; }
 #sidebar ul li a { padding: 12px 20px; display: block; color: #333; text-decoration: none; }
 #sidebar ul li.active > a { background: #e7f1ff; color: var(--primary-color); border-right: 4px solid var(--primary-color); }
@@ -27,7 +53,9 @@ body {
 /* --- NỘI DUNG CHÍNH --- */
 .main-content {
     margin-left: var(--sidebar-width);
+    margin-top: 150px;
     padding: 30px;
+    min-height: calc(100vh - 150px);
 }
 
 .dashboard-container {
@@ -49,12 +77,16 @@ body {
     overflow: visible !important;
 }
 
+
+
 /* Ép 6 hàng cân đối */
 .fc .fc-daygrid-day-frame {
-    min-height: 25px !important; 
+    min-height: 25px !important;
     overflow: visible !important;
     position: relative !important;
 }
+
+
 
 /* CHẤM ĐỎ CẢNH BÁO */
 .fc-daygrid-day.has-deadline {
@@ -76,18 +108,25 @@ body {
     display: block !important;
 }
 
+
+
 /* Màu nền ngày hiện tại 2/2 */
 .fc-day-today {
     background-color: #ebf5ff !important;
 }
 
+
+
 /* Làm mờ các ngày của tháng trước/sau */
 .fc-day-other {
     background-color: #fdfdfd !important;
 }
+
 .fc-day-other .fc-daygrid-day-number {
     color: lch(57.94% 55.44 275.09) ;
 }
+
+
 
 /* TOOLTIP */
 #calendar-tooltip {
@@ -102,26 +141,26 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+
+
 .huge-toast {
     width: 800px !important;
     padding: 20px !important;
     border: 2px solid #ffc107 !important; /* Viền vàng cảnh báo */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    Box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
 }
 
-/* Phóng to cỡ chữ tiêu đề */
 .huge-toast .swal2-title {
     font-size: 1.6rem !important;
     margin-left: 15px !important;
 }
 
-/* Phóng to icon */
 .huge-toast .swal2-icon {
     transform: scale(1.4) !important;
     margin-left: 10px !important;
 }
 
-/* Làm thanh progress dày hơn cho dễ nhìn */
+
 .huge-toast .swal2-timer-progress-bar {
     height: 6px !important;
     background: #ffc107 !important;
