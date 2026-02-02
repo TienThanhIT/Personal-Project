@@ -286,7 +286,7 @@ app.put('/api/sua-sach/:id', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'muon.html'));
+    res.sendFile(path.join(__dirname, 'demo', 'muon.html'));
 });
 
 app.listen(3000, () => {

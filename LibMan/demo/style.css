@@ -1,74 +1,128 @@
-body { display: flex; min-height: 100vh; background-color: #f8f9fa; margin: 0; }
-#sidebar {
-    width: 250px;
-    position: fixed;
-    height: 100%;
-    z-index: 1000;
-    background: #ffffff; 
-    color: #333;
-    border-right: 1px solid #e0e0e0; 
-    box-shadow: 2px 0 5px rgba(0,0,0,0.02); 
+/* --- BIẾN TOÀN CỤC --- */
+:root {
+    --sidebar-width: 250px;
+    --primary-color: #0d6efd;
+    --danger-color: #ff4d4f;
 }
 
-#sidebar .sidebar-header {
-    padding: 30px 20px;
-    background: #ffffff;
-    text-align: center;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-#sidebar .sidebar-header h4 {
-    color: #2c3e50;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+body {
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     margin: 0;
 }
 
-#sidebar ul.components {
-    padding: 20px 0;
+/* --- SIDEBAR --- */
+#sidebar {
+    width: var(--sidebar-width);
+    position: fixed;
+    height: 100vh;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    z-index: 1000;
 }
+#sidebar ul.components { padding: 20px 0; list-style: none; }
+#sidebar ul li a { padding: 12px 20px; display: block; color: #333; text-decoration: none; }
+#sidebar ul li.active > a { background: #e7f1ff; color: var(--primary-color); border-right: 4px solid var(--primary-color); }
 
-#sidebar ul li a {
-    padding: 12px 25px;
-    display: block;
-    color: #5f6368; 
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-#sidebar ul li a:hover {
-    background: #f8f9fa;
-    color: #1a73e8; /
-}
-
-#sidebar ul li.active > a {
-    background: #e8f0fe; 
-    color: #1a73e8 !important;
-    border-right: 4px solid #1a73e8; 
-    font-weight: 600;
-}
-
-#sidebar hr {
-    border-top: 1px solid #eeeeee;
-    margin: 15px 20px;
-}
-
+/* --- NỘI DUNG CHÍNH --- */
 .main-content {
-    margin-left: 250px;
-    width: calc(100% - 250px);
-    padding: 40px;
-    display: flex;
-    flex-direction: column; 
-    align-items: stretch; 
-    min-height: 100vh;
-    background-color: #f8f9fa;
+    margin-left: var(--sidebar-width);
+    padding: 30px;
 }
 
-.table-container { 
-    background: white; 
-    padding: 25px; 
-    border-radius: 12px; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+.dashboard-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.welcome-section { flex: 1; min-width: 0; }
+
+/* --- LỊCH (380PX & 6 HÀNG) --- */
+.calendar-section {
+    width: 380px !important;
+    min-width: 380px !important;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: visible !important;
+}
+
+/* Ép 6 hàng cân đối */
+.fc .fc-daygrid-day-frame {
+    min-height: 25px !important; 
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* CHẤM ĐỎ CẢNH BÁO */
+.fc-daygrid-day.has-deadline {
+    position: relative !important;
+}
+
+.fc-daygrid-day.has-deadline::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--danger-color) !important;
+    border-radius: 50%;
+    border: 2px solid white; /* Viền trắng tách biệt với màu nền xanh ngày 2/2 */
+    z-index: 9999 !important; /* Đảm bảo nổi trên tất cả các lớp của FullCalendar */
+    pointer-events: none;
+    display: block !important;
+}
+
+/* Màu nền ngày hiện tại 2/2 */
+.fc-day-today {
+    background-color: #ebf5ff !important;
+}
+
+/* Làm mờ các ngày của tháng trước/sau */
+.fc-day-other {
+    background-color: #fdfdfd !important;
+}
+.fc-day-other .fc-daygrid-day-number {
+    color: lch(57.94% 55.44 275.09) ;
+}
+
+/* TOOLTIP */
+#calendar-tooltip {
+    position: fixed;
+    background: rgba(45, 52, 54, 0.98);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 100000;
+    font-size: 13px;
+    pointer-events: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.huge-toast {
+    width: 800px !important;
+    padding: 20px !important;
+    border: 2px solid #ffc107 !important; /* Viền vàng cảnh báo */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+
+/* Phóng to cỡ chữ tiêu đề */
+.huge-toast .swal2-title {
+    font-size: 1.6rem !important;
+    margin-left: 15px !important;
+}
+
+/* Phóng to icon */
+.huge-toast .swal2-icon {
+    transform: scale(1.4) !important;
+    margin-left: 10px !important;
+}
+
+/* Làm thanh progress dày hơn cho dễ nhìn */
+.huge-toast .swal2-timer-progress-bar {
+    height: 6px !important;
+    background: #ffc107 !important;
 }
