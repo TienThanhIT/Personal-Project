@@ -1,17 +1,25 @@
 /* --- BIẾN TOÀN CỤC --- */
 :root {
     --sidebar-width: 250px;
-    --header-height: 150px;
+    --header-height: 200px;
     --primary-color: #0d6efd;
     --danger-color: #ff4d4f;
+    --red-gradient: #e31e24;
+}
+
+/* Quan trọng: Phải đặt height auto và min-height 100vh cho html/body 
+   để Sidebar absolute có thể kéo dài theo nội dung thực tế */
+html, body {
+    height: auto;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     background-color: #f4f7f6;
     font-family: 'Segoe UI', system-ui, sans-serif;
-    margin: 0;
-    position: relative;
-    min-height: 100vh;
+    position: relative; /* Làm gốc cho sidebar absolute */
     display: flex;
     flex-direction: column;
 }
@@ -22,47 +30,78 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 150px; /* Chiều cao tiêu đề */
-    background: hwb(192 29% 11%);
+    height: var(--header-height);
     color: white;
-    z-index: 1001; /* Cao hơn Sidebar để hiện tràn lề ngang */
+    z-index: 1001; /* Luôn nằm trên Sidebar */
     display: flex;
     align-items: center;
-    padding: 0 40px;
+    overflow: hidden;
+    background: 
+        linear-gradient(to right, var(--red-gradient) 0%, #be1e2d 60%, transparent 80%),
+        url('/img/thvien.jpg') no-repeat right center / 40% 100% !important;
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+    display: flex !important;
+    flex-direction: row;
     align-items: center;
+    height: 100%;
+    width: 70%; 
+    padding-left: 50px;
+    position: relative;
+    z-index: 2;
+    gap: 25px;
 }
 
-/* --- SIDEBAR --- */
+.header-logo-img {
+    height: 110px;
+    width: auto;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+}
+
+.text-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-content .mainlogo {
+    font-size: 42px;
+    font-weight: 850;
+    color: white;
+    text-transform: uppercase;
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.7); 
+    text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8);
+}
+
+/* --- SIDEBAR KÉO DÀI HẾT TRANG --- */
 #sidebar {
     width: var(--sidebar-width);
-    position: absolute;
+    position: absolute; /* Theo yêu cầu của bạn */
     top: 0;
     left: 0;
-    padding-top: 150px; 
-    height: 100%;
-    min-height: 100vh;
+    bottom: 0; /* ĐÂY LÀ CHÌA KHÓA: Ép sidebar kéo từ top 0 xuống đáy của body */
+    padding-top: var(--header-height); 
     background: #fff;
     border-right: 1px solid #ddd;
     z-index: 1000;
+    /* Loại bỏ height: 100vh để nó không bị cố định bởi màn hình */
 }
 
 #sidebar ul.components { padding: 20px 0; list-style: none; }
 #sidebar ul li a { padding: 12px 20px; display: block; color: #333; text-decoration: none; }
-#sidebar ul li.active > a { background: #e7f1ff; color: var(--primary-color); border-right: 4px solid var(--primary-color); }
+#sidebar ul li.active > a { 
+    background: #e7f1ff; 
+    color: var(--primary-color); 
+    border-right: 4px solid var(--primary-color); 
+}
 
 /* --- NỘI DUNG CHÍNH --- */
 .main-content {
     margin-left: var(--sidebar-width);
     margin-top: var(--header-height);
     padding: 30px;
+    /* Đảm bảo nội dung luôn đủ dài để test sidebar */
     min-height: calc(100vh - var(--header-height));
-    display: block;
     background-color: #f8f9fa;
 }
 

@@ -268,26 +268,38 @@ app.delete('/api/xoa-sach/:id', async (req, res) => {
         if (connection) await connection.end();
     }
 });
-// 2. API Sửa sách
+// API Sửa sách
 app.put('/api/sua-sach/:id', async (req, res) => {
-    const book_id = req.params.id;
-    const { tieude, theloai, tacgia, tongso, conlai } = req.body;
+    const { id } = req.params;
+    const { tieude, theloai, tacgia } = req.body;
+    
     let connection;
     try {
         connection = await mysql.createConnection(dbConfig);
-        const sql = `UPDATE sach SET tieude=?, theloai=?, tacgia=?, tongso=?, conlai=? WHERE book_id=?`;
-        await connection.execute(sql, [tieude, theloai, tacgia, tongso, conlai, book_id]);
-        res.json({ message: "Cập nhật thành công!" });
+        
+        // Tên bảng của bạn là 'sach' (không phải 'books')
+        const sql = "UPDATE sach SET tieude = ?, theloai = ?, tacgia = ? WHERE book_id = ?";
+        
+        const [result] = await connection.execute(sql, [tieude, theloai, tacgia, id]);
+        
+        if (result.affectedRows > 0) {
+            res.json({ message: "Cập nhật thành công" });
+        } else {
+            res.status(404).json({ error: "Không tìm thấy mã sách này" });
+        }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Lỗi cập nhật:", error);
+        res.status(500).json({ error: "Lỗi hệ thống: " + error.message });
     } finally {
         if (connection) await connection.end();
     }
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'demo', 'muon.html'));
+    res.sendFile(path.join(__dirname, 'demo'));
 });
+
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
 app.listen(3000, () => {
     console.log(' Server đang chạy tại http://localhost:3000');

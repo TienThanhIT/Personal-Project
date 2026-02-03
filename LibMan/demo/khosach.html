@@ -11,9 +11,17 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 </head>
 <body>
-<header class="web-header">
-    <div class="header-content">
-        <h1 class="logo">THƯ VIỆN TRƯỜNG CHÍNH TRỊ CẦN THƠ</h1>
+<header>
+    <div class="web-header">
+        <div class="header-content">
+            <div class="logo-wrapper">
+                <img src="/img/logo.png" alt="Logo" class="header-logo-img">
+            </div>
+            <div class="text-wrapper">
+                <span class="sublogo">Hệ thống quản lý thư viện</span>
+                <h1 class="mainlogo">Trường Chính Trị Cần Thơ</h1>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -24,7 +32,6 @@
         <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
         <li><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
         <li class="active"><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
-        <hr class="mx-3 border-secondary">
     </ul>
 </nav>
 
@@ -168,40 +175,45 @@
 
     // 5. Mở modal chỉnh sửa
     function openEditModal(book) {
-        document.getElementById('edit_book_id').value = book.book_id;
-        document.getElementById('edit_tieude').value = book.tieude;
-        document.getElementById('edit_theloai').value = book.theloai || '';
-        document.getElementById('edit_tacgia').value = book.tacgia || '';
-        modalInstance.show();
+    document.getElementById('edit_book_id').value = book.book_id;
+    document.getElementById('edit_tieude').value = book.tieude;
+    document.getElementById('edit_theloai').value = book.theloai || '';
+    document.getElementById('edit_tacgia').value = book.tacgia || '';
+    modalInstance.show();
     }
 
     // 6. Lưu dữ liệu đã sửa
     async function saveEdit() {
-        const id = document.getElementById('edit_book_id').value;
-        const payload = {
-            tieude: document.getElementById('edit_tieude').value,
-            theloai: document.getElementById('edit_theloai').value,
-            tacgia: document.getElementById('edit_tacgia').value,
-            tongso: parseInt(document.getElementById('edit_tongso').value),
-            conlai: parseInt(document.getElementById('edit_conlai').value)
-        };
+    const id = document.getElementById('edit_book_id').value;
+    
+    // Chỉ gửi những gì được phép thay đổi
+    const payload = {
+        tieude: document.getElementById('edit_tieude').value,
+        theloai: document.getElementById('edit_theloai').value,
+        tacgia: document.getElementById('edit_tacgia').value
+    };
 
-        try {
-            const res = await fetch(`/api/sua-sach/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (res.ok) {
-                Toast.fire({ icon: 'success', title: 'Đã cập nhật thông tin!' });
-                modalInstance.hide();
-                loadBooks();
-            } else {
-                Toast.fire({ icon: 'error', title: 'Lỗi khi lưu dữ liệu!' });
-            }
-        } catch (err) {
-            Toast.fire({ icon: 'error', title: 'Lỗi kết nối Server!' });
+    try {
+        const res = await fetch(`/api/sua-sach/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            Toast.fire({ icon: 'success', title: 'Cập nhật thành công!' });
+            modalInstance.hide();
+            loadBooks(); // Tải lại bảng dữ liệu
+        } else {
+            // Nếu server trả về lỗi, hiện thông báo chi tiết
+            const errorMsg = await res.text();
+            console.error("Server Error:", errorMsg);
+            Toast.fire({ icon: 'error', title: 'Server từ chối lưu dữ liệu!' });
         }
+    } catch (err) {
+        console.error("Fetch Error:", err);
+        Toast.fire({ icon: 'error', title: 'Lỗi kết nối hệ thống!' });
+    }
     }
 
     // 7. Xóa sách
