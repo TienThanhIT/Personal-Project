@@ -1,8 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
-
-const app = express(); // Khai báo app ngay từ đầu
+const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'demo')));
@@ -28,14 +27,13 @@ app.post('/api/nhap-sach', async (req, res) => {
     try {
         connection = await mysql.createConnection(dbConfig);
         
-        // 1. Kiểm tra trùng mã sách
+        // Kiểm tra trùng mã sách
         const [rows] = await connection.execute('SELECT book_id FROM sach WHERE book_id = ?', [book_id]);
         if (rows.length > 0) {
             return res.status(400).json({ error: "Mã sách này đã tồn tại trong kho!" });
         }
 
-        // 2. Chèn dữ liệu mới vào bảng sach
-        // Thứ tự cột: book_id, tieude, theloai, tacgia, nxb, namxb, tongso, conlai
+        // Chèn dữ liệu mới vào bảng sach
         const sql = `INSERT INTO sach (book_id, tieude, theloai, tacgia, nxb, namxb, tongso, conlai) 
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         
@@ -47,7 +45,7 @@ app.post('/api/nhap-sach', async (req, res) => {
             nxb || null, 
             namxb || null, 
             tongso, 
-            tongso // conlai lúc mới nhập bằng đúng số lượng tổng
+            tongso
         ]);
 
         res.json({ message: "Đã thêm sách vào kho thành công!" });
@@ -62,7 +60,6 @@ app.post('/api/nhap-sach', async (req, res) => {
 
 // API Thực hiện mượn sách
 app.post('/api/muon-sach', async (req, res) => {
-    // 1. Nhận đúng biến book_id từ Client gửi lên
     const { hoten, don_vi, sdt, book_id, han_tra } = req.body;
 
     if (!hoten || !book_id || !han_tra) {
@@ -74,10 +71,10 @@ app.post('/api/muon-sach', async (req, res) => {
         connection = await mysql.createConnection(dbConfig);
         await connection.beginTransaction();
 
-        // BƯỚC 1: Kiểm tra book_id có tồn tại không
+        // Kiểm tra book_id có tồn tại không
         const [books] = await connection.execute(
             'SELECT book_id, conlai FROM sach WHERE book_id = ?', 
-            [book_id] // Sử dụng book_id
+            [book_id] 
         );
 
         if (books.length === 0) {
@@ -91,20 +88,20 @@ app.post('/api/muon-sach', async (req, res) => {
             return res.status(400).json({ error: "Sách này đã hết trong kho!" });
         }
 
-        // BƯỚC 2: Lưu độc giả
+        // Lưu độc giả
         const [resultDG] = await connection.execute(
             'INSERT INTO docgia (hoten, donvi, sdt) VALUES (?, ?, ?)',
             [hoten, don_vi || null, sdt || null]
         );
         const docgia_id = resultDG.insertId;
 
-        // BƯỚC 3: Lưu phiếu mượn (Dùng CURDATE() cho ngày mượn)
+        // Lưu phiếu mượn 
         await connection.execute(
             'INSERT INTO phieu_muon (book_id, docgia_id, ngay_muon, han_tra) VALUES (?, ?, CURDATE(), ?)',
             [book_id, docgia_id, han_tra] 
         );
 
-        // BƯỚC 4: Trừ số lượng sách
+        // Trừ số lượng sách
         await connection.execute(
             'UPDATE sach SET conlai = conlai - 1 WHERE book_id = ?',
             [book_id]
@@ -121,7 +118,7 @@ app.post('/api/muon-sach', async (req, res) => {
     }
 });
 
-// API Lấy danh sách người mượn (Kết hợp 3 bảng)
+// API Lấy danh sách người mượn
 app.get('/api/danh-sach-muon', async (req, res) => {
     let connection;
     try {
@@ -160,13 +157,13 @@ app.post('/api/tra-sach', async (req, res) => {
         connection = await mysql.createConnection(dbConfig);
         await connection.beginTransaction();
 
-        // 1. Lấy mã sách từ phiếu mượn để hoàn kho
+        // Lấy mã sách từ phiếu mượn để hoàn kho
         const [phieu] = await connection.execute('SELECT book_id FROM phieu_muon WHERE phieu_id = ?', [phieu_id]);
         if (phieu.length === 0) return res.status(404).json({ error: "Không tìm thấy phiếu!" });
 
         const bookId = phieu[0].book_id;
 
-        // 2. CẬP NHẬT QUAN TRỌNG: Ghi nhận ngày trả VÀ đổi trạng thái thành "Đã trả"
+        // Ghi nhận ngày trả VÀ đổi trạng thái thành "Đã trả"
         const sqlUpdatePhieu = `
             UPDATE phieu_muon 
             SET ngay_tra_thuc_te = CURDATE(), 
@@ -218,11 +215,10 @@ app.get('/api/lich-su-tra', async (req, res) => {
         if (connection) await connection.end();
     }
 });
-// API lấy danh sách toàn bộ sách trong kho (Đã sửa lỗi db is not defined)
+// API lấy danh sách toàn bộ sách trong kho
 app.get('/api/kho-sach', async (req, res) => {
     let connection;
     try {
-        // Khởi tạo kết nối giống các API trên
         connection = await mysql.createConnection(dbConfig);
         
         // Thực hiện câu lệnh SQL lấy toàn bộ sách
@@ -234,7 +230,6 @@ app.get('/api/kho-sach', async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Lỗi hệ thống: " + error.message });
     } finally {
-        // Luôn đóng kết nối để tránh quá tải RAM
         if (connection) await connection.end();
     }
 });
@@ -277,7 +272,6 @@ app.put('/api/sua-sach/:id', async (req, res) => {
     try {
         connection = await mysql.createConnection(dbConfig);
         
-        // Tên bảng của bạn là 'sach' (không phải 'books')
         const sql = "UPDATE sach SET tieude = ?, theloai = ?, tacgia = ? WHERE book_id = ?";
         
         const [result] = await connection.execute(sql, [tieude, theloai, tacgia, id]);

@@ -104,7 +104,7 @@
             const todayObj = new Date(today);
             todayObj.setHours(0,0,0,0);
             const limitObj = new Date(today);
-            limitObj.setDate(todayObj.getDate() + 3); 
+            limitObj.setDate(todayObj.getDate() + 1); 
             limitObj.setHours(23,59,59,999);
 
             const upcoming = data.filter(item => {
@@ -121,7 +121,6 @@
                     showConfirmButton: false,
                     timer: 5000,
                     timerProgressBar: true,
-                    // Sử dụng class tùy chỉnh để chỉnh kích thước qua CSS
                     customClass: {
                         popup: 'huge-toast'
                     }
@@ -130,11 +129,11 @@
             }
         }
 
-        // THỰC THI: Lấy dữ liệu và gọi thông báo
+        // Lấy dữ liệu và gọi thông báo
         const eventsData = await fetchEvents();
         notifyUpcoming(eventsDataRaw, todayStr);
 
-        // KHỞI TẠO LỊCH
+        // Khởi tạo lịch
         const calendarEl = document.getElementById('calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',

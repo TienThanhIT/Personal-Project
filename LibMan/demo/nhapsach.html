@@ -125,14 +125,14 @@
                 const result = await res.json();
                 
                 if (res.ok) {
-                    // Hiển thị Toast thành công có icon
+                    // Hiển thị Toast thành công 
                     Toast.fire({
                         icon: 'success',
                         title: 'Đã nhập sách thành công!'
                     });
                     document.getElementById('formNhapSach').reset();
                 } else { 
-                    // Hiển thị Toast lỗi có icon
+                    // Hiển thị Toast lỗi
                     Toast.fire({
                         icon: 'error',
                         title: result.error || 'Lỗi khi nhập sách!'

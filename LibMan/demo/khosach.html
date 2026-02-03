@@ -116,7 +116,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // 1. Cấu hình Toast
+    // Cấu hình Toast
     const Toast = Swal.mixin({
         toast: true,
         position: 'bottom-end',
@@ -127,13 +127,13 @@
 
     let modalInstance;
 
-    // 2. Khởi tạo trang
+    // Khởi tạo trang
     window.onload = function() {
         modalInstance = new bootstrap.Modal(document.getElementById('editModal'));
         loadBooks();
     };
 
-    // 3. Tải dữ liệu từ API
+    // Tải dữ liệu từ API
     async function loadBooks() {
         try {
             const res = await fetch('/api/kho-sach');
@@ -145,7 +145,7 @@
         }
     }
 
-    // 4. Hiển thị bảng dữ liệu
+    // Hiển thị bảng dữ liệu
     function renderTable(data) {
         const body = document.getElementById('bookTableBody');
         if (!data || data.length === 0) {
@@ -173,7 +173,7 @@
         `).join('');
     }
 
-    // 5. Mở modal chỉnh sửa
+    // Mở modal chỉnh sửa
     function openEditModal(book) {
     document.getElementById('edit_book_id').value = book.book_id;
     document.getElementById('edit_tieude').value = book.tieude;
@@ -182,11 +182,9 @@
     modalInstance.show();
     }
 
-    // 6. Lưu dữ liệu đã sửa
+    // Lưu dữ liệu đã sửa
     async function saveEdit() {
     const id = document.getElementById('edit_book_id').value;
-    
-    // Chỉ gửi những gì được phép thay đổi
     const payload = {
         tieude: document.getElementById('edit_tieude').value,
         theloai: document.getElementById('edit_theloai').value,
@@ -203,7 +201,7 @@
         if (res.ok) {
             Toast.fire({ icon: 'success', title: 'Cập nhật thành công!' });
             modalInstance.hide();
-            loadBooks(); // Tải lại bảng dữ liệu
+            loadBooks();
         } else {
             // Nếu server trả về lỗi, hiện thông báo chi tiết
             const errorMsg = await res.text();
@@ -216,7 +214,7 @@
     }
     }
 
-    // 7. Xóa sách
+    // Xóa sách
     async function deleteBook(book_id) {
         const result = await Swal.fire({
             title: 'Xác nhận xóa?',
@@ -244,7 +242,7 @@
         }
     }
 
-    // 8. Tìm kiếm nhanh
+    // Tìm kiếm nhanh
     document.getElementById('searchInKho').oninput = function(e) {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('#bookTableBody tr').forEach(row => {
@@ -252,7 +250,7 @@
         });
     };
 
-    // 9. Xuất Excel
+    // Xuất Excel
     async function exportKhoSach() {
         try {
             const res = await fetch('/api/kho-sach');
@@ -270,7 +268,7 @@
 
             const worksheet = XLSX.utils.json_to_sheet(excelData);
             
-            // Định dạng Header căn giữa, màu xanh
+            // Định dạng Header 
             const range = XLSX.utils.decode_range(worksheet['!ref']);
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const addr = XLSX.utils.encode_cell({ r: 0, c: C });

@@ -70,7 +70,7 @@
     <script>
         const Toast = Swal.mixin({
     toast: true,
-    position: 'bottom-end', // Vị trí góc phải dưới
+    position: 'bottom-end',
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
@@ -85,7 +85,7 @@
             if (!res.ok) throw new Error("Lỗi tải dữ liệu");
             
             const data = await res.json();
-            console.log("Dữ liệu nhận được từ API:", data); // Dùng để kiểm tra lỗi ở F12
+            console.log("Dữ liệu nhận được từ API:", data); 
 
             const listBody = document.getElementById('listDaTra');
             
@@ -95,21 +95,21 @@
             }
 
             const html = data.map(item => {
-                // Kiểm tra và ép kiểu ngày tháng an toàn
+                // Kiểm tra và ép kiểu ngày tháng đúng định dạng
                 const dMuon = item.ngay_muon ? new Date(item.ngay_muon) : null;
                 const dHan = item.han_tra ? new Date(item.han_tra) : null;
                 const dThuc = item.ngay_tra_thuc_te ? new Date(item.ngay_tra_thuc_te) : null;
 
                 if (!dThuc) return ''; // Bỏ qua nếu dòng này chưa thực sự trả
 
-                // Logic so sánh ngày (bỏ qua giờ)
+                // Logic so sánh ngày (chỉ ngày, không tính giờ phút giây)
                 const isLate = dThuc.setHours(0,0,0,0) > dHan.setHours(0,0,0,0);
                 const color = isLate ? 'text-danger' : 'text-success';
                 const note = isLate ? 'Trả muộn' : 'Đúng hạn';
                 const badgeClass = isLate ? 'bg-danger' : 'bg-success';
                 const iconClass = isLate ? 'bi-exclamation-triangle' : 'bi-check-circle';
 
-                // Lưu ý: Đảm bảo tên cột (item.hoten, item.tieude) khớp với kết quả JOIN ở Server
+                // Đảm bảo tên cột (item.hoten, item.tieude) khớp với kết quả JOIN ở Server
                 return `
                     <tr>
                         <td><strong>${item.hoten || 'N/A'}</strong></td>
@@ -135,7 +135,7 @@
 
     loadLichSu();
 
-    // Hàm xuất Excel giữ nguyên logic nhưng bổ sung kiểm tra dữ liệu
+    // Hàm xuất Excel
     async function exportLichSu() {
     try {
         const res = await fetch('/api/lich-su-tra');
@@ -161,7 +161,7 @@
                 const address = XLSX.utils.encode_cell({ r: R, c: C });
                 if (!worksheet[address]) continue;
 
-                // 1. CĂN GIỮ CHO HEADER (Dòng 0)
+                // Định dạng Header
                 if (R === 0) {
                     worksheet[address].s = {
                         alignment: { horizontal: "center", vertical: "center" },
@@ -169,8 +169,7 @@
                         fill: { fgColor: { rgb: "2E7D32" } } // Nền xanh lá cho header
                     };
                 } else {
-                    // 2. TÔ ĐỎ DÒNG TRẢ MUỘN
-                    // Cột "Trạng thái" thường là cột cuối cùng (cột index 6)
+                    // Tô màu đỏ cho những dòng "Trả muộn"
                     const statusCell = worksheet[XLSX.utils.encode_cell({ r: R, c: 6 })];
                     if (statusCell && statusCell.v === "Trả muộn") {
                         worksheet[address].s = {

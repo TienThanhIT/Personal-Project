@@ -80,15 +80,15 @@
                 }
 
                const html = data.map((item, index) => {
-                // 1. Chuẩn hóa Ngày Hiện Tại (về 0h 0p 0s)
+                // Chuẩn hóa Ngày Hiện Tại (về 0h 0p 0s)
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-                // 2. Chuẩn hóa Hạn Trả (về 0h 0p 0s)
+                // Chuẩn hóa Hạn Trả (về 0h 0p 0s)
                 const dHanTraRaw = new Date(item.han_tra);
                 const dHanTra = new Date(dHanTraRaw.getFullYear(), dHanTraRaw.getMonth(), dHanTraRaw.getDate());
 
-                // 3. Logic: Quá hạn khi Ngày hiện tại LỚN HƠN Hạn trả
+                // Logic: Quá hạn khi Ngày hiện tại > Hạn trả
                 // Nếu hôm nay là 2/2/2026 và hạn trả là 1/2/2026 -> Quá hạn
                 const isOverdue = today > dHanTra && item.trang_thai !== 'Đã trả';
                 
@@ -141,12 +141,11 @@
                     });
 
                     if (res.ok) {
-                        // Hiện thông báo nhỏ thành công ở góc phải
                         Toast.fire({
                             icon: 'success',
                             title: 'Đã cập nhật trạng thái trả sách!'
                         });
-                        loadDanhSach(); // Tải lại bảng
+                        loadDanhSach();
                     } else {
                         throw new Error();
                     }

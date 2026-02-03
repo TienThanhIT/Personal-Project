@@ -7,8 +7,6 @@
     --red-gradient: #e31e24;
 }
 
-/* Quan trọng: Phải đặt height auto và min-height 100vh cho html/body 
-   để Sidebar absolute có thể kéo dài theo nội dung thực tế */
 html, body {
     height: auto;
     min-height: 100vh;
@@ -19,7 +17,7 @@ html, body {
 body {
     background-color: #f4f7f6;
     font-family: 'Segoe UI', system-ui, sans-serif;
-    position: relative; /* Làm gốc cho sidebar absolute */
+    position: relative;
     display: flex;
     flex-direction: column;
 }
@@ -32,7 +30,7 @@ body {
     width: 100%;
     height: var(--header-height);
     color: white;
-    z-index: 1001; /* Luôn nằm trên Sidebar */
+    z-index: 1001;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -76,15 +74,14 @@ body {
 /* --- SIDEBAR KÉO DÀI HẾT TRANG --- */
 #sidebar {
     width: var(--sidebar-width);
-    position: absolute; /* Theo yêu cầu của bạn */
+    position: absolute;
     top: 0;
     left: 0;
-    bottom: 0; /* ĐÂY LÀ CHÌA KHÓA: Ép sidebar kéo từ top 0 xuống đáy của body */
+    bottom: 0;
     padding-top: var(--header-height); 
     background: #fff;
     border-right: 1px solid #ddd;
     z-index: 1000;
-    /* Loại bỏ height: 100vh để nó không bị cố định bởi màn hình */
 }
 
 #sidebar ul.components { padding: 20px 0; list-style: none; }
@@ -100,7 +97,6 @@ body {
     margin-left: var(--sidebar-width);
     margin-top: var(--header-height);
     padding: 30px;
-    /* Đảm bảo nội dung luôn đủ dài để test sidebar */
     min-height: calc(100vh - var(--header-height));
     background-color: #f8f9fa;
 }
@@ -131,7 +127,7 @@ body {
 
 .welcome-section { flex: 1; min-width: 0; }
 
-/* --- LỊCH (380PX & 6 HÀNG) --- */
+/* --- LỊCH --- */
 .calendar-section {
     width: 380px !important;
     min-width: 380px !important;
@@ -149,7 +145,7 @@ body {
     text-transform: capitalize;
 }
 
-/* Đổi màu icon mũi tên điều hướng sang màu xanh */
+/* Đổi màu icon mũi tên điều hướng */
 .fc .fc-button-primary {
     background-color: transparent !important;
     border-color: transparent !important;
@@ -188,7 +184,7 @@ body {
     display: block !important;
 }
 
-/* Màu nền ngày hiện tại 2/2 */
+/* Màu nền ngày hiện tại */
 .fc-day-today {
     background-color: #ebf5ff !important;
 }
