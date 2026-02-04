@@ -117,6 +117,8 @@ body {
 
 .flex-center .card {
     margin: 0 !important;
+    max-width: 600px;
+    width: 100%;
 }
 
 .dashboard-container {
@@ -195,7 +197,7 @@ body {
 }
 
 .fc-day-other .fc-daygrid-day-number {
-    color: lch(57.94% 55.44 275.09) ;
+    color: #447ee9;
 }
 
 /* TOOLTIP */
