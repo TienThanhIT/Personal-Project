@@ -94,6 +94,11 @@ body {
     color: var(--primary-color); 
     border-right: 4px solid var(--primary-color); 
 }
+#sidebar ul li a.text-danger:hover {
+    background: #fff1f0; /* Nền đỏ nhạt khi di chuột */
+    color: #d32f2f !important;
+    border-right: 4px solid #d32f2f;
+}
 
 /* --- NỘI DUNG CHÍNH --- */
 .main-content {
@@ -215,12 +220,17 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+.swal2-container {
+    z-index: 9999 !important;
+}
+
 .huge-toast {
     width: 800px !important;
     padding: 20px !important;
     border: 2px solid #ffc107 !important; /* Viền vàng cảnh báo */
     Box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
 }
+
 
 .huge-toast .swal2-title {
     font-size: 1.6rem !important;
@@ -236,4 +246,37 @@ body {
 .huge-toast .swal2-timer-progress-bar {
     height: 6px !important;
     background: #ffc107 !important;
+}
+
+.login-page-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f7f6; /* Màu nền xám nhạt */
+    z-index: 9999; /* Đảm bảo nằm trên mọi thứ khác */
+}
+
+.login-form {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 500px;
+    border-top: 6px solid #d32f2f;
+    position: relative;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #b71c1c;
 }

@@ -295,6 +295,28 @@ app.put('/api/sua-sach/:id', async (req, res) => {
     }
 });
 
+// API Đăng nhập
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    let connection;
+    try {
+        connection = await mysql.createConnection(dbConfig);
+        const sql = "SELECT * FROM ngdung WHERE USERNAME = ? AND PASS = ?";
+        const [rows] = await connection.execute(sql, [username, password]);
+
+        if (rows.length > 0) {
+            res.json({ success: true, message: "Đăng nhập thành công!" });
+        } else {
+            res.status(401).json({ success: false, message: "Sai tài khoản hoặc mật khẩu!" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    } finally {
+        if (connection) await connection.end();
+    }
+});
+
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'demo'));
 });

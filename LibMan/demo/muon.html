@@ -30,6 +30,7 @@
             <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
             <li><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
             <li><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
+            <li><a href="/login.html" id="btnLogout" class="text-danger fw-bold"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
         </ul>
     </nav>
 
@@ -162,6 +163,29 @@
         document.addEventListener('click', (e) => {
             if (e.target !== inputSearch) suggestDiv.innerHTML = '';
         });
+
+        document.getElementById('btnLogout').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    Swal.fire({
+        title: 'Xác nhận đăng xuất?',
+        text: "Bạn sẽ quay lại màn hình đăng nhập!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d32f2f',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Đăng xuất',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Xóa session/localStorage nếu có
+            localStorage.removeItem('isLoggedIn'); 
+            // Chuyển hướng về trang login
+            window.location.href = 'login.html';
+        }
+    });
+});
+
     </script>
 </body>
 </html>
