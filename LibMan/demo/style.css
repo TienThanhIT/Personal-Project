@@ -1,282 +1,429 @@
-/* --- BIẾN TOÀN CỤC --- */
+/* --- 1. TỔNG QUAN & BIẾN TOÀN CỤC --- */
 :root {
-    --sidebar-width: 250px;
-    --header-height: 200px;
     --primary-color: #0d6efd;
-    --danger-color: #ff4d4f;
+    --danger-color: #dc3545;
+    --success-color: #198754;
+    --sidebar-width: 250px;
+    --header-height: 180px;
     --red-gradient: #e31e24;
+    --bg-light: #f4f7f6;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* Quan trọng: Phải đặt height auto và min-height 100vh cho html/body 
-   để Sidebar absolute có thể kéo dài theo nội dung thực tế */
+/* --- 2. CẤU TRÚC NỀN TẢNG --- */
 html, body {
-    height: auto;
-    min-height: 100vh;
     margin: 0;
     padding: 0;
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    overflow: hidden; /* Chặn cuộn toàn trang để tạo cảm giác ứng dụng chuyên nghiệp */
 }
 
-body {
-    background-color: #f4f7f6;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    position: relative; /* Làm gốc cho sidebar absolute */
-    display: flex;
-    flex-direction: column;
-}
-
-/* --- ĐẦU TRANG CỐ ĐỊNH --- */
+/* --- 3. ĐẦU TRANG (FIXED HEADER) --- */
 .web-header {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: var(--header-height);
     color: white;
-    z-index: 1001; /* Luôn nằm trên Sidebar */
+    z-index: 2000 !important; 
     display: flex;
     align-items: center;
-    overflow: hidden;
     background: 
-        linear-gradient(to right, var(--red-gradient) 0%, #be1e2d 60%, transparent 80%),
-        url('/img/thvien.jpg') no-repeat right center / 40% 100% !important;
+        linear-gradient(to right, 
+            var(--red-gradient) 0%, 
+            #be1e2d 60%, 
+            rgba(190, 30, 45, 0.6) 70%, 
+            transparent 85%             
+        ),
+        url('../img/thvien.jpg') no-repeat right center;
+    background-size: 100% 100%, 40% 100% !important; 
+    background-color: #be1e2d; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .header-content {
-    display: flex !important;
-    flex-direction: row;
+    display: flex;
     align-items: center;
-    height: 100%;
-    width: 70%; 
     padding-left: 50px;
-    position: relative;
-    z-index: 2;
     gap: 25px;
 }
 
 .header-logo-img {
-    height: 110px;
+    height: 100px;
     width: auto;
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
-.text-wrapper {
-    display: flex;
-    flex-direction: column;
+.header-content .sublogo {
+    display: block;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: -5px;
 }
 
 .header-content .mainlogo {
-    font-size: 42px;
+    font-size: 36px;
     font-weight: 850;
-    color: white;
+    margin: 0;
     text-transform: uppercase;
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.7); 
-    text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8);
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3); 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* --- SIDEBAR KÉO DÀI HẾT TRANG --- */
+/* --- 4. THANH ĐIỀU HƯỚNG (SIDEBAR) --- */
 #sidebar {
     width: var(--sidebar-width);
-    position: absolute; /* Theo yêu cầu của bạn */
-    top: 0;
+    position: fixed;
+    top: var(--header-height);
     left: 0;
-    bottom: 0; /* ĐÂY LÀ CHÌA KHÓA: Ép sidebar kéo từ top 0 xuống đáy của body */
-    padding-top: var(--header-height); 
+    bottom: 0;
     background: #fff;
     border-right: 1px solid #ddd;
     z-index: 1000;
-    /* Loại bỏ height: 100vh để nó không bị cố định bởi màn hình */
+    overflow-y: hidden;
+    transition: all 0.3s;
 }
 
-#sidebar ul.components { padding: 20px 0; list-style: none; }
-#sidebar ul li a { padding: 12px 20px; display: block; color: #333; text-decoration: none; }
-#sidebar ul li.active > a { 
-    background: #e7f1ff; 
-    color: var(--primary-color); 
-    border-right: 4px solid var(--primary-color); 
-}
-#sidebar ul li a.text-danger:hover {
-    background: #fff1f0; /* Nền đỏ nhạt khi di chuột */
-    color: #d32f2f !important;
-    border-right: 4px solid #d32f2f;
+#sidebar ul.components {
+    padding: 20px 0;
 }
 
-/* --- NỘI DUNG CHÍNH --- */
+#sidebar ul li a {
+    padding: 12px 25px;
+    display: block;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+#sidebar ul li a:hover, #sidebar ul li.active > a {
+    background: #f8f9fa;
+    color: var(--success-color);
+    padding-left: 35px;
+}
+
+#sidebar ul li a i {
+    margin-right: 10px;
+}
+
+/* --- 5. NỘI DUNG CHÍNH (MAIN CONTENT) --- */
 .main-content {
     margin-left: var(--sidebar-width);
     margin-top: var(--header-height);
     padding: 30px;
-    /* Đảm bảo nội dung luôn đủ dài để test sidebar */
-    min-height: calc(100vh - var(--header-height));
-    background-color: #f8f9fa;
-}
-
-.flex-center {
+    height: calc(100vh - var(--header-height));
+    overflow-y: hidden; /* Chỉ cuộn bên trong vùng nội dung */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Căn giữa form theo chiều ngang */
+    align-items: flex-start; /* Form bắt đầu từ phía trên */
 }
 
-.main-content.flex-center {
-    display: flex;
-    justify-content: center; 
-    align-items: center;    
-    min-height: calc(100vh - var(--header-height)); 
-    padding: 20px; 
+/* --- 6. PHONG CÁCH CARD & FORM (PHÓNG TO) --- */
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg) !important;
+    border: none;
 }
 
-.flex-center .card {
-    margin: 0 !important;
-}
-
-.dashboard-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 30px;
-}
-
-.welcome-section { flex: 1; min-width: 0; }
-
-/* --- LỊCH (380PX & 6 HÀNG) --- */
-.calendar-section {
-    width: 380px !important;
-    min-width: 380px !important;
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    overflow: visible !important;
-}
-
-/* Đổi màu tiêu đề tháng */
-.fc .fc-toolbar-title {
-    color: #198754; 
-    font-weight: bold;
-    text-transform: capitalize;
-}
-
-/* Đổi màu icon mũi tên điều hướng sang màu xanh */
-.fc .fc-button-primary {
-    background-color: transparent !important;
-    border-color: transparent !important;
-    color: #198754 !important;
-}
-
-.fc .fc-button-primary:hover {
-    background-color: #f8f9fa !important;
-    color: #146c43 !important;
-}
-
-/* Ép 6 hàng cân đối */
-.fc .fc-daygrid-day-frame {
-    min-height: 25px !important;
-    overflow: visible !important;
-    position: relative !important;
-}
-
-/* CHẤM ĐỎ CẢNH BÁO */
-.fc-daygrid-day.has-deadline {
-    position: relative !important;
-}
-
-.fc-daygrid-day.has-deadline::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: var(--danger-color) !important;
-    border-radius: 50%;
-    border: 2px solid white;
-    z-index: 9999 !important; 
-    pointer-events: none;
-    display: block !important;
-}
-
-/* Màu nền ngày hiện tại 2/2 */
-.fc-day-today {
-    background-color: #ebf5ff !important;
-}
-
-/* Làm mờ các ngày của tháng trước/sau */
-.fc-day-other {
-    background-color: #fdfdfd !important;
-}
-
-.fc-day-other .fc-daygrid-day-number {
-    color: lch(57.94% 55.44 275.09) ;
-}
-
-/* TOOLTIP */
-#calendar-tooltip {
-    position: fixed;
-    background: rgba(45, 52, 54, 0.98);
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    z-index: 100000;
-    font-size: 13px;
-    pointer-events: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.swal2-container {
-    z-index: 9999 !important;
-}
-
-.huge-toast {
-    width: 800px !important;
+.card-header {
     padding: 20px !important;
-    border: 2px solid #ffc107 !important; /* Viền vàng cảnh báo */
-    Box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
 }
 
-
-.huge-toast .swal2-title {
-    font-size: 1.6rem !important;
-    margin-left: 15px !important;
+.card-header h5 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
 }
 
-.huge-toast .swal2-icon {
-    transform: scale(1.4) !important;
-    margin-left: 10px !important;
+.card-body {
+    padding: 2.5rem !important;
 }
 
+.form-label {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
 
-.huge-toast .swal2-timer-progress-bar {
-    height: 6px !important;
-    background: #ffc107 !important;
+.form-control {
+    font-size: 1.05rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+}
+
+/* --- 7. NÚT BẤM (BUTTONS) --- */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border: none;
+    padding: 12px;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+}
+
+/* --- 8. TRANG LOGIN --- */
+body.login-active {
+    overflow: auto;
+}
+
+body.login-active #sidebar {
+    display: none;
 }
 
 .login-page-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    padding-top: var(--header-height);
+    background-color: var(--bg-light);
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f4f7f6; /* Màu nền xám nhạt */
-    z-index: 9999; /* Đảm bảo nằm trên mọi thứ khác */
 }
 
 .login-form {
     background: white;
     padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
     width: 100%;
-    max-width: 500px;
-    border-top: 6px solid #d32f2f;
+    max-width: 450px;
+    border-top: 8px solid var(--danger-color);
+}
+
+/* --- 9. DASHBOARD & LỊCH --- */
+.dashboard-container {
+    display: flex;
+    gap: 25px;
+    width: 100%;
+}
+
+.stats-section { flex: 1; }
+
+.calendar-sidebar {
+    width: 500px; /* Bỏ !important và đưa về kích thước nhỏ */
+    min-width: 350px;
+}
+
+.calendar-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Hiệu ứng ô hạn trả trên lịch */
+.has-deadline {
     position: relative;
+    background-color: #fff9f9 !important;
+    cursor: pointer;
 }
 
-.btn-danger {
-    background-color: #d32f2f;
-    border: none;
+.fc-daygrid-event-harness, 
+.fc-daygrid-event, 
+.fc-event, 
+.fc-daygrid-event-dot {
+    display: none !important;
 }
 
-.btn-danger:hover {
-    background-color: #b71c1c;
+.has-deadline::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--danger-color);
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.is-overdue::before {
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+/* --- 10. ĐIỀU CHỈNH RESPONSIVE --- */
+@media (max-width: 992px) {
+    #sidebar {
+        left: calc(-1 * var(--sidebar-width));
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+    .dashboard-container {
+        flex-direction: column;
+    }
+    .calendar-sidebar {
+        width: 100%;
+    }
+}
+
+/* --- 11. ĐỊNH DẠNG BẢNG (TABLES) --- */
+
+/* Khung chứa bảng có con lăn (Scroll) */
+.table-responsive-scroll {
+    max-height: 500px; /* Tăng độ cao một chút cho thoáng */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Giữ tiêu đề bảng cố định khi cuộn và đổ màu xanh */
+.table-responsive-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--success-color) !important; /* Dùng biến màu xanh đã định nghĩa */
+    color: white !important;
+    padding: 15px !important;
+    border-bottom: none;
+}
+
+/* Định dạng các dòng trong bảng */
+.table tbody td {
+    padding: 12px 15px !important;
+    border-bottom: 1px solid #eee;
+}
+
+/* Nút Xuất Excel đặc biệt */
+#btnExport {
+    padding: 8px 15px;      
+    font-size: 15px;      
+    font-weight: bold;
+    border-radius: 12px;      
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(25, 135, 84, 0.2);
+}
+
+#btnExport:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
+    background-color: #157347;
+}
+
+/* Cụm công cụ bên phải tiêu đề */
+.header-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+/* --- 12. TỐI ƯU RIÊNG CHO FORM NHẬP/MƯỢN SÁCH --- */
+
+/* Khống chế chiều cao card để không bị lấp bởi Header/Footer */
+.card-form-container {
+    max-height: calc(100vh - var(--header-height) - 60px);
+    overflow-y: hidden;
+    width: 95%;
+    max-width: 800px;
+}
+
+/* Tinh chỉnh khoảng cách dòng trong form */
+.form-group-custom {
+    margin-bottom: 1rem !important;
+}
+
+/* Hiệu ứng focus cho input đồng bộ với màu chủ đạo */
+.form-control:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+}
+
+/* Nút bấm trong form */
+.btn-form {
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/*13. --- PHẦN DÀNH CHO FORM MƯỢN SÁCH --- */
+
+/* Màu xanh chủ đạo cho Header của Card mượn sách */
+.card-header {
+    background: #198754 !important; /* Màu xanh success */
+    padding: 1.25rem !important;
+}
+
+.card-header h5 {
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+/* Tùy chỉnh ô gợi ý tên độc giả */
+.suggest-box {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 0 0 10px 10px;
+}
+
+.suggest-box .list-group-item {
+    border-left: none;
+    border-right: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.suggest-box .list-group-item:hover {
+    background-color: #f8f9fa;
+    color: #198754;
+    padding-left: 25px; /* Hiệu ứng đẩy nhẹ khi di chuột */
+}
+
+/* Định dạng các ô nhập liệu (Input) */
+.form-control {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+}
+
+/* Nút xác nhận */
+.btn-success {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
 }

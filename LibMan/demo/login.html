@@ -60,31 +60,37 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (result.success) {
+            // 1. Thiết lập trạng thái đăng nhập
+            localStorage.setItem('isLoggedIn', 'true');
+
             await Swal.fire({
                 icon: 'success',
                 title: 'Thành công',
                 text: 'Đang vào hệ thống...',
-                timer: 1500,
+                timer: 1000,
                 showConfirmButton: false
             });
-            window.location.href = 'dashboard.html';
-        } else {
-            // Hiện thông báo lỗi trực tiếp từ JSON server trả về
-            Swal.fire({
-                icon: 'error',
-                title: 'Thất bại',
-                text: result.message || 'Sai tài khoản/mật khẩu'
-            });
+            
+            // 2. Vào thẳng Dashboard
+            window.location.replace('dashboard.html'); 
         }
-    } catch (error) {
-        // Chỉ hiện lỗi này nếu server sập (không kết nối được)
-        Swal.fire({
-            icon: 'warning',
-            title: 'Lỗi kết nối',
-            text: 'Server chưa bật hoặc bị lỗi mạng'
+            else {
+                    // Hiện thông báo lỗi trực tiếp từ JSON server trả về
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại',
+                        text: result.message || 'Sai tài khoản/mật khẩu'
+                    });
+                }
+            } catch (error) {
+                // Chỉ hiện lỗi này nếu server sập (không kết nối được)
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Lỗi kết nối',
+                    text: 'Server chưa bật hoặc bị lỗi mạng'
+                });
+            }
         });
-    }
-});
 </script>
 </body>
 </html>

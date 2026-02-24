@@ -323,6 +323,8 @@ app.get('/', (req, res) => {
 
 app.use('/img', express.static(path.join(__dirname, 'img')));
 
+app.use(express.static(__dirname));
+
 app.listen(3000, () => {
     console.log(' Server đang chạy tại http://localhost:3000');
 });

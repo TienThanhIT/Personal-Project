@@ -3,205 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Quản lý Thư viện</title>
+    <title>Dashboard - Hệ thống Quản lý Thư viện</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css"> 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <style>
+        /* TÙY CHỈNH LỊCH THEO YÊU CẦU */
+        /* Ẩn các thanh sự kiện mặc định để lịch sạch sẽ */
+        .fc-event {
+            display: none !important;
+        }
+
+        /* Định nghĩa ô ngày có hạn trả */
+        .has-deadline {
+            position: relative;
+            cursor: pointer;
+            background-color: #fffcfc !important;
+        }
+
+        /* Tạo dấu chấm đỏ ở góc trái trên */
+        .has-deadline::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 7px;
+            height: 7px;
+            background-color: #dc3545; /* Màu đỏ cảnh báo */
+            border-radius: 50%;
+            z-index: 5;
+        }
+
+        /* Hiệu ứng khi rê chuột vào ô ngày */
+        .has-deadline:hover {
+            background-color: #ffe6e6 !important;
+        }
+
+        /* Cấu hình lại chiều cao lịch ở sidebar cho gọn */
+        #calendar {
+            font-size: 0.85rem;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.1rem;
+            text-transform: capitalize;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <div class="web-header">
-        <div class="header-content">
-            <div class="logo-wrapper">
-                <img src="/img/logo.png" alt="Logo" class="header-logo-img">
-            </div>
-            <div class="text-wrapper">
-                <span class="sublogo">Hệ thống quản lý thư viện</span>
-                <h1 class="mainlogo">Trường Chính Trị Cần Thơ</h1>
-            </div>
-        </div>
-    </div>
-</header>
+    <header id="header-placeholder" class="web-header"></header>
+    
+    <nav id="sidebar"></nav>
 
-<nav id="sidebar">
-    <ul class="list-unstyled components">
-        <li class="active"><a href="/dashboard.html"><i class="bi bi-house-door"></i> Trang chủ</a></li>
-        <li><a href="/muon.html"><i class="bi bi-person-plus-fill"></i> Cho mượn sách</a></li>
-        <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
-        <li><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
-        <li><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
-        <li><a href="/login.html" id="btnLogout" class="text-danger fw-bold"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-    </ul>
-</nav>
-
-<div class="main-content">
-    <div class="dashboard-container">
-        <div class="welcome-section">
-            <h3 class="fw-bold">Hệ thống Quản lý</h3>
-            <p class="text-muted">Tổng quan tình hình thư viện hôm nay.</p>
-            <div class="row g-3 mt-2">
-                <div class="col-6">
-                    <div class="card border-0 bg-primary text-white shadow-sm p-3">
-                        <small>Đang mượn</small>
-                        <h2 id="count-muon" class="mb-0">0</h2>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="card border-0 bg-danger text-white shadow-sm p-3">
-                        <small>Quá hạn</small>
-                        <h2 id="count-overdue" class="mb-0">0</h2>
+    <div class="main-content">
+        <div class="dashboard-container">
+            <div class="stats-section">
+                <div class="welcome-section mb-4">
+                    <h3 class="fw-bold">Hệ thống Quản lý</h3>
+                    <p class="text-muted">Tổng quan tình hình thư viện hôm nay.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-primary text-white shadow-sm p-4">
+                                <small class="text-white-50">Đang mượn</small>
+                                <h2 id="count-muon" class="mb-0 fw-bold">0</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-danger text-white shadow-sm p-4">
+                                <small class="text-white-50">Quá hạn</small>
+                                <h2 id="count-overdue" class="mb-0 fw-bold">0</h2>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="calendar-section">
-            <h6 class="text-success fw-bold"><i class="bi bi-calendar3"></i> Hạn trả sách</h6>
-            <div id="calendar"></div>
+            <div class="calendar-sidebar">
+                <div class="calendar-card shadow-sm">
+                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-calendar3"></i> Hạn trả sách</h6>
+                    <div id="calendar"></div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        const todayStr = new Date().toLocaleDateString('en-CA');
-        let eventsDataRaw = []; 
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+    // 1. NẠP LAYOUT (HEADER & SIDEBAR)
+    async function loadLayout() {
+        try {
+            const [hRes, sRes] = await Promise.all([
+                fetch('header.html'),
+                fetch('sidebar.html')
+            ]);
+            document.getElementById('header-placeholder').innerHTML = await hRes.text();
+            document.getElementById('sidebar').innerHTML = await sRes.text();
+            
+            const activeLink = document.querySelector('#sidebar a[href="dashboard.html"]');
+            if(activeLink) activeLink.parentElement.classList.add('active');
+        } catch (e) { console.error("Lỗi nạp layout:", e); }
+    }
+    await loadLayout();
 
-        async function fetchEvents() {
-            try {
-                const res = await fetch('/api/danh-sach-muon'); 
-                const data = await res.json();
-                eventsDataRaw = data; 
-                
-                document.getElementById('count-muon').innerText = data.length;
-                const overdueCount = data.filter(item => {
-                    const d = new Date(item.han_tra);
-                    return d.toLocaleDateString('en-CA') < todayStr;
-                }).length;
-                document.getElementById('count-overdue').innerText = overdueCount;
+    // 2. HÀM KIỂM TRA VÀ HIỂN THỊ THÔNG BÁO (TOAST)
+    function checkDeadlines(data) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-                return data.map(item => {
-                    let formattedDate;
-                    if (typeof item.han_tra === 'string' && item.han_tra.includes('/')) {
-                        const parts = item.han_tra.split('/');
-                        formattedDate = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                    } else {
-                        formattedDate = new Date(item.han_tra).toLocaleDateString('en-CA');
-                    }
-                    return { title: item.hoten, start: formattedDate, description: item.tieude };
-                });
-            } catch (e) {
-                // Dữ liệu giả định để test khi API lỗi
-                return eventsDataRaw.map(item => ({ title: item.hoten, start: item.han_tra, description: item.tieude }));
-            }
-        }
+        // Lọc ra các phiếu mượn còn đúng hoặc ít hơn 3 ngày là đến hạn (nhưng chưa quá hạn)
+        const upcomingDeadlines = data.filter(item => {
+            const hanTra = new Date(item.han_tra);
+            const diffTime = hanTra - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays <= 3 && diffDays >= 0; 
+        });
 
-        function notifyUpcoming(data, today) {
-            const hasShown = sessionStorage.getItem('hasShownNotification');
-            if (hasShown) return;
-
-            const todayObj = new Date(today);
-            todayObj.setHours(0,0,0,0);
-            const limitObj = new Date(today);
-            limitObj.setDate(todayObj.getDate() + 3); 
-            limitObj.setHours(23,59,59,999);
-
-            const upcoming = data.filter(item => {
-                const d = new Date(item.han_tra);
-                return d >= todayObj && d <= limitObj;
+        if (upcomingDeadlines.length > 0) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom-end', // Góc phải dưới
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
             });
 
-            if (upcoming.length > 0) {
-                Swal.fire({
-                    toast: true,
-                    position: 'bottom-end',
-                    icon: 'warning',
-                    title: `Có ${upcoming.length} phiếu mượn sắp quá hạn!`,
-                    showConfirmButton: false,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    // Sử dụng class tùy chỉnh để chỉnh kích thước qua CSS
-                    customClass: {
-                        popup: 'huge-toast'
-                    }
-                });
-                sessionStorage.setItem('hasShownNotification', 'true');
-            }
+            Toast.fire({
+                icon: 'warning',
+                title: `Có ${upcomingDeadlines.length} yêu cầu sắp đến hạn trả!`,
+                text: 'Vui lòng kiểm tra lịch để biết chi tiết.'
+            });
         }
+    }
 
-        // THỰC THI: Lấy dữ liệu và gọi thông báo
-        const eventsData = await fetchEvents();
-        notifyUpcoming(eventsDataRaw, todayStr);
+    // 3. LOGIC LẤY DỮ LIỆU VÀ KHỞI TẠO LỊCH
+    async function initDashboard() {
+        try {
+            const res = await fetch('/api/danh-sach-muon');
+            const data = await res.json();
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-        // KHỞI TẠO LỊCH
-        const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'vi',
-            titleFormat: { month: '2-digit', year: 'numeric' },
-            height: 'auto',
-            firstDay: 1, 
-            initialDate: todayStr,
-            fixedWeekCount: true,      
-            showNonCurrentDates: true,
-            headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-            dayCellDidMount: function(info) {
-                const cellDate = info.date.toLocaleDateString('en-CA');
-                const list = eventsData.filter(e => e.start === cellDate);
-                if (list.length > 0) {
-                    info.el.classList.add('has-deadline'); 
-                    if (cellDate < todayStr) info.el.classList.add('is-overdue');
-                    
-                    info.el.addEventListener('mouseenter', function(e) {
-                        const tooltip = document.createElement('div');
-                        tooltip.id = 'calendar-tooltip';
-                        let content = `<b>Hạn trả: ${cellDate}</b><hr style="margin:5px 0">`;
-                        list.forEach(item => { content += `• ${item.title}: <i>${item.description}</i><br>`; });
-                        tooltip.innerHTML = content;
-                        document.body.appendChild(tooltip);
-                        
-                        const tooltipWidth = 220; 
-                        const spaceRight = window.innerWidth - e.clientX;
-                        if (spaceRight < tooltipWidth + 20) {
-                            tooltip.style.left = (e.clientX - tooltipWidth - 15) + 'px';
-                        } else {
-                            tooltip.style.left = (e.clientX + 15) + 'px';
-                        }
-                        tooltip.style.top = (e.clientY + 15) + 'px';
+            // Cập nhật số liệu thống kê
+            document.getElementById('count-muon').innerText = data.length;
+            document.getElementById('count-overdue').innerText = data.filter(item => {
+                return new Date(item.han_tra) < today;
+            }).length;
+
+            // Gọi hàm kiểm tra thông báo
+            checkDeadlines(data);
+
+            // Khởi tạo FullCalendar
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'vi',
+                firstDay: 1, 
+                height: 'auto',
+                headerToolbar: {
+                    left: 'title',
+                    center: '',
+                    right: 'prev,next'
+                },
+                events: data.map(item => ({
+                    title: item.hoten,
+                    start: item.han_tra,
+                    extendedProps: { tieude: item.tieude }
+                })),
+
+                dayCellDidMount: function(info) {
+                    const dateStr = info.date.toLocaleDateString('en-CA');
+                    const eventsToday = data.filter(i => {
+                        const d = new Date(i.han_tra).toLocaleDateString('en-CA');
+                        return d === dateStr;
                     });
-                    info.el.addEventListener('mouseleave', () => {
-                        const t = document.getElementById('calendar-tooltip');
-                        if (t) t.remove();
+                    
+                    if (eventsToday.length > 0) {
+                        info.el.classList.add('has-deadline');
+                        const listPeople = eventsToday.map(e => `- ${e.hoten} (${e.tieude})`).join('\n');
+                        info.el.setAttribute('title', `Hạn trả sách:\n${listPeople}`);
+                    }
+                },
+
+                eventClick: function(info) {
+                    Swal.fire({
+                        title: 'Chi tiết hạn trả',
+                        html: `<b>Người mượn:</b> ${info.event.title}<br>
+                               <b>Tên sách:</b> ${info.event.extendedProps.tieude}`,
+                        icon: 'info'
                     });
                 }
-            }
-        });
-        calendar.render();
-    });
+            });
+            calendar.render();
 
-    document.getElementById('btnLogout').addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    Swal.fire({
-        title: 'Xác nhận đăng xuất?',
-        text: "Bạn sẽ quay lại màn hình đăng nhập!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d32f2f',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Đăng xuất',
-        cancelButtonText: 'Hủy'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Xóa session/localStorage nếu có
-            localStorage.removeItem('isLoggedIn'); 
-            // Chuyển hướng về trang login
-            window.location.href = 'login.html';
+        } catch (error) {
+            console.error("Lỗi:", error);
+        }
+    }
+    initDashboard();
+
+    // 4. XỬ LÝ ĐĂNG XUẤT
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#btnLogout')) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận đăng xuất?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#be1e2d',
+                confirmButtonText: 'Đăng xuất'
+            }).then((result) => {
+                if (result.isConfirmed) window.location.href = 'login.html';
+            });
         }
     });
 });
-</script>
+    </script>
 </body>
 </html>

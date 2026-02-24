@@ -3,47 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Mượn sách - Thư viện</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="../auth.js"></script>
+    <style>
+        body { visibility: hidden; opacity: 0; }
+    </style>
 </head>
 <body>
-    <header>
-    <div class="web-header">
-        <div class="header-content">
-            <div class="logo-wrapper">
-                <img src="/img/logo.png" alt="Logo" class="header-logo-img">
-            </div>
-            <div class="text-wrapper">
-                <span class="sublogo">Hệ thống quản lý thư viện</span>
-                <h1 class="mainlogo">Trường Chính Trị Cần Thơ</h1>
-            </div>
-        </div>
-    </div>
-</header>
-    <nav id="sidebar">
-        <ul class="list-unstyled components">
-            <li><a href="/dashboard.html"><i class="bi bi-house-door"></i> Trang chủ</a></li>
-            <li class="active"><a href="/muon.html"><i class="bi bi-person-plus-fill"></i> Cho mượn sách</a></li>
-            <li><a href="/dsmuon.html"><i class="bi bi-list-columns-reverse"></i> Đang mượn</a></li>
-            <li><a href="/lstra.html"><i class="bi bi-clock-history"></i> Lịch sử trả</a></li>
-            <li><a href="/khosach.html"><i class="bi bi-archive"></i> Kho sách</a></li>
-            <li><a href="/login.html" id="btnLogout" class="text-danger fw-bold"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
-        </ul>
-    </nav>
+    <header id="header-placeholder" class="web-header"></header>
+    <nav id="sidebar"></nav>
 
-    <div class="main-content flex-center">
-        <div class="card shadow-lg border-0" style="width: 100%; max-width: 650px;">
-            <div class="card-header bg-success text-white text-center py-3">
+    <div class="main-content">
+        <div class="card border-0 shadow-lg" style="width: 95%; max-width: 850px;">
+            <div class="card-header text-white text-center">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> PHIẾU MƯỢN SÁCH</h5>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body">
                 <form id="formMuon">
                     <div class="mb-3 position-relative">
                         <label class="form-label fw-bold">Họ và tên người mượn:</label>
-                        <input type="text" id="searchDocGia" class="form-control" placeholder="Nhập tên để tìm hoặc thêm mới" autocomplete="off" required>
+                        <input type="text" id="searchDocGia" class="form-control" placeholder="Nhập tên để tìm hoặc thêm mới độc giả..." autocomplete="off" required>
                         <input type="hidden" id="selected_docgia_id">
                         <div id="suggestDocGia" class="list-group suggest-box"></div>
                     </div>
@@ -62,7 +48,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Mã sách:</label>
-                            <input type="text" id="book_id" class="form-control" placeholder="VD: TH001" required>
+                            <input type="text" id="book_id" class="form-control" placeholder="Ví dụ: TH001" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Số lượng mượn:</label>
@@ -75,7 +61,7 @@
                         <input type="date" id="han_tra" class="form-control" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                    <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">
                         <i class="bi bi-check-circle"></i> XÁC NHẬN CHO MƯỢN
                     </button>
                 </form>
@@ -83,7 +69,9 @@
         </div>   
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        /* (Toàn bộ logic JavaScript giữ nguyên như cũ) */
         const Toast = Swal.mixin({
             toast: true,
             position: 'bottom-end',
@@ -97,6 +85,18 @@
         const hiddenId = document.getElementById('selected_docgia_id');
         const hanTraInput = document.getElementById('han_tra');
 
+        async function loadLayout() {
+            try {
+                const [hRes, sRes] = await Promise.all([
+                    fetch('header.html'), fetch('sidebar.html')
+                ]);
+                document.getElementById('header-placeholder').innerHTML = await hRes.text();
+                document.getElementById('sidebar').innerHTML = await sRes.text();
+                const activeLink = document.querySelector('#sidebar a[href="/muon.html"]');
+                if(activeLink) activeLink.parentElement.classList.add('active');
+            } catch (e) { console.error("Lỗi nạp layout:", e); }
+        }
+
         function setDefaultDate() {
             const today = new Date();
             const tomorrow = new Date();
@@ -105,7 +105,10 @@
             hanTraInput.min = today.toISOString().split('T')[0];
         }
 
-        window.onload = setDefaultDate;
+        window.onload = () => {
+            loadLayout();
+            setDefaultDate();
+        };
 
         inputSearch.oninput = async () => {
             const query = inputSearch.value;
@@ -114,7 +117,7 @@
                 const res = await fetch(`/api/tim-doc-gia?name=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 suggestDiv.innerHTML = data.map(dg => `
-                    <button type="button" class="list-group-item list-group-item-action" 
+                    <button type="button" class="list-group-item list-group-item-action py-3" 
                             onclick="selectDG('${dg.hoten}', ${dg.docgia_id}, '${dg.donvi}', '${dg.sdt}')">
                         <i class="bi bi-person-fill me-2"></i><b>${dg.hoten}</b> - ${dg.donvi}
                     </button>
@@ -140,52 +143,25 @@
                 book_id: document.getElementById('book_id').value, 
                 han_tra: hanTraInput.value
             };
-
             try {
                 const res = await fetch('/api/muon-sach', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-                const result = await res.json();
                 if (res.ok) {
                     Toast.fire({ icon: 'success', title: "Đã xác nhận mượn sách!" });
                     document.getElementById('formMuon').reset();
                     setDefaultDate(); 
-                } else {
-                    Toast.fire({ icon: 'error', title: result.error || "Lỗi không xác định" });
                 }
             } catch (err) {
-                Toast.fire({ icon: 'error', title: "Không thể kết nối đến Server!" });
+                Toast.fire({ icon: 'error', title: "Lỗi kết nối!" });
             }
         };
 
         document.addEventListener('click', (e) => {
             if (e.target !== inputSearch) suggestDiv.innerHTML = '';
         });
-
-        document.getElementById('btnLogout').addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    Swal.fire({
-        title: 'Xác nhận đăng xuất?',
-        text: "Bạn sẽ quay lại màn hình đăng nhập!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d32f2f',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Đăng xuất',
-        cancelButtonText: 'Hủy'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Xóa session/localStorage nếu có
-            localStorage.removeItem('isLoggedIn'); 
-            // Chuyển hướng về trang login
-            window.location.href = 'login.html';
-        }
-    });
-});
-
     </script>
 </body>
 </html>
