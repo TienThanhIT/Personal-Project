@@ -427,3 +427,43 @@ body.login-active #sidebar {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
 }
+
+  /* TÙY CHỈNH LỊCH THEO YÊU CẦU */
+        /* Ẩn các thanh sự kiện mặc định để lịch sạch sẽ */
+        .fc-event {
+            display: none !important;
+        }
+
+        /* Định nghĩa ô ngày có hạn trả */
+        .has-deadline {
+            position: relative;
+            cursor: pointer;
+            background-color: #fffcfc !important;
+        }
+
+        /* Tạo dấu chấm đỏ ở góc trái trên */
+        .has-deadline::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 7px;
+            height: 7px;
+            background-color: #dc3545; /* Màu đỏ cảnh báo */
+            border-radius: 50%;
+            z-index: 5;
+        }
+
+        /* Hiệu ứng khi rê chuột vào ô ngày */
+        .has-deadline:hover {
+            background-color: #ffe6e6 !important;
+        }
+
+        /* Cấu hình lại chiều cao lịch ở sidebar cho gọn */
+        #calendar {
+            font-size: 0.85rem;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.1rem;
+            text-transform: capitalize;
+        }
